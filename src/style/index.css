@@ -1,0 +1,12 @@
+@import "tailwindcss";
+.btn {
+  @apply bg-red-300 text-black py-2 px-4 rounded hover:bg-red-200;
+}.card {
+  @apply bg-white shadow-md rounded-lg p-6 border border-gray-200;
+}
+
+
+
+
+
+
