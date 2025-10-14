@@ -4,28 +4,70 @@ import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import CustomTable from '../../../../components/CustomTable';
 
-const subscriptionColumns = [
+const attendanceColumns = [
   { key: 'id', header: '#' },
-  { key: 'package', header: 'Package Name' },
+  { key: 'dayIn', header: 'Day In' },
+  { key: 'dayOut', header: 'Day Out' },
+  { key: 'date', header: 'Date' },
   { key: 'studio', header: 'Studio Name' },
   { key: 'location', header: 'Location' },
-  { key: 'session', header: 'Session' },
-  { key: 'days', header: 'Days' },
-  { key: 'category', header: 'Category' },
-  { key: 'duration', header: 'Duration' },
-  { key: 'time', header: 'Time' },
-  { key: 'status', header: 'Status', render: (v) => (
-    <span className="inline-flex items-center gap-2 text-green-600">
-      {/* <span className="h-2 w-2  bg-green-500" /> */}
-      {v}
-    </span>
-  ) },
+  { key: 'shift', header: 'Shift' },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (v) => {
+      const isPresent = v.toLowerCase() === 'present';
+      return (
+        <span
+          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+            isPresent
+              ? 'bg-green-100 text-green-700'
+              : 'bg-red-100 text-red-700'
+          }`}
+        >
+          <span
+            className={`h-2 w-2 rounded-full mr-1 ${
+              isPresent ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          ></span>
+          {v}
+        </span>
+      );
+    },
+  },
 ];
 
-const subscriptionRows = [
-  { id: 1, package: 'Package Name', studio: 'Studio Name', location: 'Chennai', session: '5/10', days: 'Wed, Fri, Sat', category: 'Beginner', duration: '3 Months', time: 'Afternoon', status: 'Activated' },
-  { id: 2, package: 'Package Name', studio: 'Studio Name', location: 'Chennai', session: '5/10', days: 'Wed, Fri, Sat', category: 'Beginner', duration: '1 Months', time: 'Afternoon', status: 'Activated' },
-  { id: 3, package: 'Package Name', studio: 'Studio Name', location: 'Chennai', session: '5/10', days: 'Wed, Fri, Sat', category: 'Beginner', duration: '6 Months', time: 'Afternoon', status: 'Activated' },
+const attendanceRows = [
+  {
+    id: 1,
+    dayIn: '11:00 AM',
+    dayOut: '07:00 PM',
+    date: '2025-10-10',
+    studio: 'Studio A',
+    location: 'Chennai',
+    shift: 'Morning',
+    status: 'Present',
+  },
+  {
+    id: 2,
+    dayIn: '11:05 AM',
+    dayOut: '07:10 PM',
+    date: '2025-10-11',
+    studio: 'Studio A',
+    location: 'Chennai',
+    shift: 'Morning',
+    status: 'Absent',
+  },
+  {
+    id: 3,
+    dayIn: '11:02 AM',
+    dayOut: '07:03 PM',
+    date: '2025-10-12',
+    studio: 'Studio A',
+    location: 'Chennai',
+    shift: 'Morning',
+    status: 'Present',
+  },
 ];
 
 function Panel({ value, index, children }) {
@@ -38,27 +80,46 @@ function Panel({ value, index, children }) {
 
 function DetailTabs() {
   const [value, setValue] = React.useState(0);
-  return (<>
-    <div className=" p-2 ">
-      <div className='bg-white border border-gray-200 rounded-xl py-1 px-24 shadow-sm'>
-      <Tabs value={value} onChange={(_e, v) => setValue(v)} sx={{ minHeight: 36, '& .MuiTab-root': { minHeight: 36, textTransform: 'none' } }}>
-        <Tab label="Subscription" />
-        <Tab label="Refer and Earn" />
-        <Tab label="Wallet" />
-      </Tabs></div>
+
+  return (
+    <div className="p-2">
+      <div className="bg-white border border-gray-200 rounded-xl py-1 px-24 shadow-sm">
+        <Tabs
+          value={value}
+          onChange={(_e, v) => setValue(v)}
+          sx={{
+            minHeight: 36,
+            '& .MuiTab-root': { minHeight: 36, textTransform: 'none' },
+          }}
+        >
+          <Tab label="Attendance" />
+          <Tab label="Pay Slip" />
+          <Tab label="Batch" />
+        </Tabs>
+      </div>
+
+      {/* Attendance Table */}
       <Panel value={value} index={0}>
-        <CustomTable columns={subscriptionColumns} data={subscriptionRows} enablePagination={false} />
+        <CustomTable
+          columns={attendanceColumns}
+          data={attendanceRows}
+          enablePagination={false}
+        />
       </Panel>
+
+      {/* Pay Slip */}
       <Panel value={value} index={1}>
-        <div className="text-sm text-gray-500">No referrals yet.</div>
+        <div className="text-sm text-gray-500">No pay slips available yet.</div>
       </Panel>
+
+      {/* Batch */}
       <Panel value={value} index={2}>
-        <div className="text-sm text-gray-500">Wallet activity will appear here.</div>
+        <div className="text-sm text-gray-500">
+          Batch details will appear here.
+        </div>
       </Panel>
     </div>
-  </>);
+  );
 }
 
 export default DetailTabs;
-
-

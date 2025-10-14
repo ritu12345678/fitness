@@ -3,17 +3,10 @@ import CustomSelect from '../../../components/CustomSelect';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MenuItem from '@mui/material/MenuItem';
-import AddTrainerModal from './AddTrainerModal';
-function TrainerFilter({ onSearch, onFilterChange }) {
+
+function FeedbackFilter() {
   const [query, setQuery] = React.useState('');
   const [filter, setFilter] = React.useState('all');
-  const [date, setDate] = React.useState('any');
-
-  React.useEffect(() => {
-    onFilterChange?.({ filter, date, query });
-  }, [filter, date, query, onFilterChange]);
-
-  const [openAdd, setOpenAdd] = React.useState(false);
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex items-center gap-3">
@@ -34,7 +27,7 @@ function TrainerFilter({ onSearch, onFilterChange }) {
             renderValue: (val) => (
               <span className="inline-flex items-center gap-1">
                 {val === 'all' && <FilterAltOutlinedIcon sx={{ fontSize: 18, color: '#9ca3af' }} />}
-                {val === 'all' ? 'All Filter' : val === 'active' ? 'Active' : 'Inactive'}
+                {val === 'all' ? 'All Filter' : val}
               </span>
             ),
           }}
@@ -45,25 +38,15 @@ function TrainerFilter({ onSearch, onFilterChange }) {
               All Filter
             </span>
           </MenuItem>
-          <MenuItem value="active">Active</MenuItem>
-          <MenuItem value="inactive">Inactive</MenuItem>
+          <MenuItem value="New">New</MenuItem>
+          <MenuItem value="Seen">Seen</MenuItem>
         </CustomSelect>
       </div>
-      <div className="w-28">
-        <CustomSelect
-          size="small"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          options={[{ label: 'Date', value: 'any' }, { label: 'Today', value: 'today' }, { label: 'This week', value: 'week' }]}
-        />
-      </div>
-      <button className="rounded-2xl bg-white border border-gray-200 px-3 py-1 text-sm"><SummarizeOutlinedIcon style={{ color: "#D3D3D3" }} />Export</button>
-      <button onClick={() => setOpenAdd(true)} className="  bg-[#F6A5A5] text-black px-3 py-2 text-sm rounded-2xl">+ Add Trainer</button>
-      <AddTrainerModal open={openAdd} onClose={() => setOpenAdd(false)} onSave={() => setOpenAdd(false)} />
+      <button className="rounded-2xl bg-white border border-gray-200 px-3 py-1 text-sm"><SummarizeOutlinedIcon style={{ color: '#D3D3D3' }} />Export</button>
     </div>
   );
 }
 
-export default TrainerFilter;
+export default FeedbackFilter;
 
 

@@ -9,6 +9,12 @@ import TrainerPage from '../pages/TrainerPage';
 import TrainerDetailPage from '../pages/TrainerDetailPage';
 import UserPage from '../pages/UserPage';
 import UserDetailPage from '../pages/UserDetailPage';
+import BatchPage from '../pages/BatchPage';
+import BatchDetailPage from '../pages/BatchDetailPage';
+import BannerPage from '../pages/BannerPage';
+import PageManagementPage from '../pages/PageManagementPage';
+import FeedbackPage from '../pages/FeedbackPage';
+import SettingsPage from '../pages/SettingsPage';
 
 
 export const router = createBrowserRouter([
@@ -27,14 +33,15 @@ export const router = createBrowserRouter([
   { path: '/user/detail', element: <Layout />, children: [{ index: true, element: <UserDetailPage/> }] },
    { path: '/trainer-detail', element: <Layout />, children: [{ index: true, element: <TrainerDetailPage/> }] },
   { path: '/trainer', element: <Layout />, children: [{ index: true, element:<TrainerPage/> }] },
-  { path: '/batch', element: <Layout />, children: [{ index: true, element: <div>Batch page</div> }] },
-  { path: '/banner', element: <Layout />, children: [{ index: true, element: <div>Banner Management</div> }] },
-  { path: '/pages', element: <Layout />, children: [{ index: true, element: <div>Page Management</div> }] },
-  { path: '/setup', element: <Layout />, children: [{ index: true, element: <div>Set Up</div> }] },
+  { path: '/batch', element: <Layout />, children: [{ index: true, element: <BatchPage/> }] },
+  { path: '/batch/detail', element: <Layout />, children: [{ index: true, element: <BatchDetailPage/> }] },
+  // { path: '/banner', element: <Layout />, children: [{ index: true, element: <BannerPage/> }] },
+  // { path: '/pages', element: <Layout />, children: [{ index: true, element: <PageManagementPage /> }] },
+  // { path: '/feedback', element: <Layout />, children: [{ index: true, element: <FeedbackPage /> }] },
+  // { path: '/settings', element: <Layout />, children: [{ index: true, element: <SettingsPage /> }] },
   { path: '/team', element: <Layout />, children: [{ index: true, element: <div>Team Management</div> }] },
   { path: '/support', element: <Layout />, children: [{ index: true, element: <div>Support Management</div> }] },
-  { path: '/feedback', element: <Layout />, children: [{ index: true, element: <div>Feedback</div> }] },
-  { path: '/settings', element: <Layout />, children: [{ index: true, element: <div>Settings</div> }] },
+
 ]);
 
 

@@ -3,6 +3,7 @@ import CustomSelect from '../../../components/CustomSelect';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MenuItem from '@mui/material/MenuItem';
+import AddUserModal from './AddUserModal';
 function UserFilters({ onSearch, onFilterChange }) {
   const [query, setQuery] = React.useState('');
   const [filter, setFilter] = React.useState('all');
@@ -11,6 +12,8 @@ function UserFilters({ onSearch, onFilterChange }) {
   React.useEffect(() => {
     onFilterChange?.({ filter, date, query });
   }, [filter, date, query, onFilterChange]);
+
+  const [openAdd, setOpenAdd] = React.useState(false);
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex items-center gap-3">
@@ -55,7 +58,8 @@ function UserFilters({ onSearch, onFilterChange }) {
         />
       </div>
       <button className="rounded-2xl bg-white border border-gray-200 px-3 py-1 text-sm"><SummarizeOutlinedIcon style={{ color: "#D3D3D3" }} />Export</button>
-      <button className="  bg-[#F6A5A5] text-black px-3 py-2 text-sm rounded-2xl">+ Add User</button>
+      <button onClick={() => setOpenAdd(true)} className=" bg-[#F6A5A5] text-black px-3 py-2 text-sm rounded-2xl">+ Add User</button>
+      <AddUserModal open={openAdd} onClose={() => setOpenAdd(false)} onSave={() => setOpenAdd(false)} />
     </div>
   );
 }

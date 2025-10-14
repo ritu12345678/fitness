@@ -4,6 +4,8 @@ import CalendarCard from './components/CalendarCard';
 import UpcomingEvents from './components/UpcomingEvents';
 import BarChartCard from './components/BarChartCard';
 import PieChartCard from './components/PieChartCard';
+import TopStudiosTable from './components/TopStudiosTable';
+import PackageExpiryTable from './components/PackageExpiryTable';
 
 function Dashboard() {
   return (
@@ -37,11 +39,23 @@ function Dashboard() {
       </div>
     </div>
   </div>
+
+  {/* Third row: Top Studio (full width) */}
+  <div>
+    <TopStudiosTable />
+  </div>
+
+  {/* Fourth row: Package Expiry (full width) */}
+  <div>
+    <PackageExpiryTable />
+  </div>
 </div>
 
   );
 }
 
 export default Dashboard;
+
+
 
 

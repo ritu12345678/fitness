@@ -12,6 +12,5 @@ function Trainer() {
     </div>
   );
 }
-
 export default Trainer;
 

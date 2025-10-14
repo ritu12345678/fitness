@@ -21,9 +21,8 @@ function useColumns(onOpenMenu) {
     },
     { key: 'name', header: 'Name' },
     { key: 'mobile', header: 'Mobile Number' },
-    { key: 'email', header: 'Email' },
+    { key: 'role', header: 'Role' },
     { key: 'location', header: 'Location' },
-    { key: 'feesDue', header: 'Fees Due Date' },
     {
       key: 'action',
       header: 'Action',
@@ -37,13 +36,13 @@ function useColumns(onOpenMenu) {
 }
 
 const rows = [
-  { id: 1, name: 'Eleanor Pena', mobile: '784532690', email: 'xxx@gmail.com', location: 'Madan', feesDue: '5', avatar: 'https://i.pravatar.cc/40?img=21' },
-  { id: 2, name: 'Theresa Webb', mobile: '784532690', email: 'xxx@gmail.com', location: 'Rathi', feesDue: '6', avatar: 'https://i.pravatar.cc/40?img=22' },
-  { id: 3, name: 'Annette Black', mobile: '784532690', email: 'xxx@gmail.com', location: 'Rathi', feesDue: '20', avatar: 'https://i.pravatar.cc/40?img=23' },
-  { id: 4, name: 'Darlene Robertson', mobile: '784532690', email: 'xxx@gmail.com', location: 'Madan', feesDue: '15', avatar: 'https://i.pravatar.cc/40?img=24' },
-  { id: 5, name: 'Devon Lane', mobile: '784532690', email: 'xxx@gmail.com', location: 'Ganezh', feesDue: '15', avatar: 'https://i.pravatar.cc/40?img=25' },
-  { id: 6, name: 'Savannah Nguyen', mobile: '784532690', email: 'xxx@gmail.com', location: 'Ganezh', feesDue: '15', avatar: 'https://i.pravatar.cc/40?img=26' },
-  { id: 7, name: 'Kristin Watson', mobile: '784532690', email: 'xxx@gmail.com', location: 'Ganezh', feesDue: '15', avatar: 'https://i.pravatar.cc/40?img=27' },
+  { id: 1, name: 'Eleanor Pena', mobile: '784532690', role: 'Worker', location: 'Madan', avatar: 'https://i.pravatar.cc/40?img=21' },
+  { id: 2, name: 'Theresa Webb', mobile: '784532690', role: 'Trainer', location: 'Rathi', avatar: 'https://i.pravatar.cc/40?img=22' },
+  { id: 3, name: 'Annette Black', mobile: '784532690', role: 'Supervisor', location: 'Rathi', avatar: 'https://i.pravatar.cc/40?img=23' },
+  { id: 4, name: 'Darlene Robertson', mobile: '784532690', role: 'Worker', location: 'Madan', avatar: 'https://i.pravatar.cc/40?img=24' },
+  { id: 5, name: 'Devon Lane', mobile: '784532690', role: 'Trainer', location: 'Ganezh', avatar: 'https://i.pravatar.cc/40?img=25' },
+  { id: 6, name: 'Savannah Nguyen', mobile: '784532690', role: 'Assistant', location: 'Ganezh', avatar: 'https://i.pravatar.cc/40?img=26' },
+  { id: 7, name: 'Kristin Watson', mobile: '784532690', role: 'Worker', location: 'Ganezh', avatar: 'https://i.pravatar.cc/40?img=27' },
 ];
 
 function TrainerTable() {
@@ -60,12 +59,11 @@ function TrainerTable() {
   };
   const handleDetail = () => {
     handleClose();
-    navigate('/user/detail');
+    navigate('/trainer-detail');
   };
   const handleEdit = () => {
     handleClose();
-    // Placeholder for edit action
-    navigate('/user/detail');
+    navigate('/trainer/detail');
   };
 
   const columns = useColumns(handleOpenMenu);
@@ -82,5 +80,3 @@ function TrainerTable() {
 }
 
 export default TrainerTable;
-
-

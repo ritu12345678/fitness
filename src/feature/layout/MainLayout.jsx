@@ -69,6 +69,12 @@ function Layout(props) {
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];
 
+  // Get current page title based on location
+  const getCurrentPageTitle = () => {
+    const currentItem = menuItems.find(item => item.path === location.pathname);
+    return currentItem ? currentItem.text : 'Overview';
+  };
+
   const drawer = (
     <div>
       <Toolbar />
@@ -79,15 +85,31 @@ function Layout(props) {
           return (
           <ListItem key={item.text} disablePadding>
             <ListItemButton selected={selected} onClick={() => navigate(item.path)} sx={{
-              '&.Mui-selected': { bgcolor: '#fee2e2' },
+              '&.Mui-selected': {
+                bgcolor: '#C82D30',
+                '& .MuiListItemIcon-root': { color: '#C82D30', bgcolor: '#ffffff', borderRadius: '50%' },
+                '& .MuiListItemText-primary': { color: '#ffffff' },
+              },
+              '&.Mui-selected:hover': { bgcolor: '#C82D30' },
               '&:hover': { bgcolor: '#f3f4f6' },
               borderRadius: 1,
               mx: 1,
             }}>
-              <ListItemIcon>
+              <ListItemIcon  sx={{
+                    minWidth: 'auto',
+                    color: '#6b7280',
+                    bgcolor: '#f3f4f6',
+                    borderRadius: '50%',
+                    width: 32,
+                    height: 32,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mr: 1.25,
+                  }}>
                 {item.icon}
               </ListItemIcon>
-              <ListItemText primary={item.text} />
+              <ListItemText primary={item.text} sx={{ '.MuiListItemText-primary': { fontSize: 14 } }} />
             </ListItemButton>
           </ListItem>
         );})}
@@ -133,7 +155,7 @@ function Layout(props) {
               <MenuIcon />
             </IconButton>
             <Typography variant="subtitle1" noWrap component="div" sx={{ fontWeight: 600 }}>
-              Overview
+              {getCurrentPageTitle()}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
