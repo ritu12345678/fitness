@@ -40,3 +40,4 @@ function PaginationBar({ currentPage, totalPages, pageSize, onPageChange, onPage
 export default PaginationBar;
 
 
+

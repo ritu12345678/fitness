@@ -36,7 +36,7 @@ function CustomModal({
   fullWidth = true,
   contentSx,
   paperSx,
-  actionsAlign = 'flex-end',
+  actionsAlign = 'center',
 }) {
   return (
     <Dialog

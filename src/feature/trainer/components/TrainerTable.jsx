@@ -59,7 +59,7 @@ function TrainerTable() {
   };
   const handleDetail = () => {
     handleClose();
-    navigate('/trainer-detail');
+    navigate('/trainer/detail');
   };
   const handleEdit = () => {
     handleClose();

@@ -1,14 +1,16 @@
 import React from 'react'
-import PagesFeature from '../feature/pages'
+
+import PagesFeature from '../feature/pageManagement'
 
 const PageManagementPage = () => {
   return (
     <div>
-      <PagesFeature/>
+  <PagesFeature/>
     </div>
   )
 }
 
 export default PageManagementPage
+
 
 

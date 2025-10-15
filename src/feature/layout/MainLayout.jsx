@@ -13,6 +13,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import Collapse from '@mui/material/Collapse';
 import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
@@ -30,6 +31,15 @@ import GroupIcon from '@mui/icons-material/Group';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import SettingsIcon from '@mui/icons-material/Settings';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import ConfirmationNumberOutlinedIcon from '@mui/icons-material/ConfirmationNumberOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
+import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
+import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 
 const drawerWidth = 240;
 
@@ -62,17 +72,59 @@ function Layout(props) {
     { text: 'Batch', icon: <ListAltIcon />, path: '/batch' },
     { text: 'Banner Management', icon: <ImageIcon />, path: '/banner' },
     { text: 'Page Management', icon: <ArticleIcon />, path: '/pages' },
-    { text: 'Set Up', icon: <SettingsSuggestIcon />, path: '/setup' },
-    { text: 'Team Management', icon: <GroupIcon />, path: '/team' },
-    { text: 'Support Management', icon: <SupportAgentIcon />, path: '/support' },
+    {
+      text: 'Set Up', icon: <SettingsSuggestIcon />, path: '/setup',
+      children: [
+        { text: 'Studio Packages', icon: <CreditCardOutlinedIcon />, path: '/setup/studio-packages' },
+        { text: 'Program', icon: <CategoryOutlinedIcon />, path: '/setup/program' },
+        { text: 'Studio', icon: <StorefrontOutlinedIcon />, path: '/setup/studio' },
+      ],
+    },
+    {
+      text: 'Team Management', icon: <GroupIcon />, path: '/team',
+      children: [
+        { text: 'Team Role', icon: <BadgeOutlinedIcon />, path: '/team/role' },
+        { text: 'Team List', icon: <BadgeOutlinedIcon />, path: '/team/list' },
+      ],
+    },
+    {
+      text: 'Support Management', icon: <SupportAgentIcon />, path: '/support',
+      children: [
+        { text: 'Ticket', icon: <ConfirmationNumberOutlinedIcon />, path: '/support/ticket' },
+        { text: 'Faq', icon: <HelpOutlineOutlinedIcon />, path: '/support/faq' },
+        { text: 'Delete Request', icon: <DeleteOutlineOutlinedIcon />, path: '/support/delete-request' },
+      ],
+    },
     { text: 'Feedback', icon: <FeedbackIcon />, path: '/feedback' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];
 
-  // Get current page title based on location
+  // Normalize detail routes to their parent sections for title/selection
+  const getNormalizedPath = () => {
+    const p = location.pathname;
+    if (p.startsWith('/user/')) return '/user';
+    if (p.startsWith('/trainer/')) return '/trainer';
+    if (p.startsWith('/batch/')) return '/batch';
+    return p;
+  };
+
+  // Get current page title based on normalized location, including child items
   const getCurrentPageTitle = () => {
-    const currentItem = menuItems.find(item => item.path === location.pathname);
+    const p = location.pathname;
+    for (const item of menuItems) {
+      if (item.children) {
+        const child = item.children.find((c) => p.startsWith(c.path));
+        if (child) return child.text;
+      }
+    }
+    const currentItem = menuItems.find(item => item.path === getNormalizedPath());
     return currentItem ? currentItem.text : 'Overview';
+  };
+
+  const [openSections, setOpenSections] = React.useState({});
+
+  const toggleSection = (key) => {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const drawer = (
@@ -81,10 +133,13 @@ function Layout(props) {
       <Divider />
       <List>
         {menuItems.map((item) => {
-          const selected = location.pathname === item.path;
+          const normalized = getNormalizedPath();
+          const selected = normalized === item.path || (item.children && item.children.some((c) => normalized.startsWith(c.path.split('/').slice(0,2).join('/'))));
+          const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+          const isOpen = openSections[item.text] === true;
           return (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton selected={selected} onClick={() => navigate(item.path)} sx={{
+          <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
+            <ListItemButton selected={selected} onClick={() => hasChildren ? toggleSection(item.text) : navigate(item.path)} sx={{
               '&.Mui-selected': {
                 bgcolor: '#C82D30',
                 '& .MuiListItemIcon-root': { color: '#C82D30', bgcolor: '#ffffff', borderRadius: '50%' },
@@ -110,7 +165,30 @@ function Layout(props) {
                 {item.icon}
               </ListItemIcon>
               <ListItemText primary={item.text} sx={{ '.MuiListItemText-primary': { fontSize: 14 } }} />
+              {hasChildren && (isOpen ? <ExpandLess sx={{ color: selected ? '#ffffff' : '#6b7280' }} /> : <ExpandMore sx={{ color: selected ? '#ffffff' : '#6b7280' }} />)}
             </ListItemButton>
+            {hasChildren && (
+              <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                <Box sx={{ mx: 1.5, mb: 1, mt: 0.5, bgcolor: '#eaa5a5', borderRadius: 2, p: 1 }}>
+                  {item.children.map((child) => {
+                    const childSelected = location.pathname.startsWith(child.path);
+                    return (
+                      <ListItemButton key={child.text} onClick={() => navigate(child.path)} sx={{
+                        borderRadius: 1.5,
+                        mb: 0.5,
+                        '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' },
+                        bgcolor: childSelected ? 'rgba(255,255,255,0.35)' : 'transparent',
+                      }}>
+                        <ListItemIcon sx={{ minWidth: 28, color: '#ffffff' }}>
+                          {child.icon}
+                        </ListItemIcon>
+                        <ListItemText primary={child.text} sx={{ '.MuiListItemText-primary': { fontSize: 13, color: '#ffffff' } }} />
+                      </ListItemButton>
+                    );
+                  })}
+                </Box>
+              </Collapse>
+            )}
           </ListItem>
         );})}
       </List>
@@ -154,6 +232,13 @@ function Layout(props) {
             >
               <MenuIcon />
             </IconButton>
+            {/* Back arrow on detail pages */}
+            {(['/user/detail','/batch/detail','/trainer/detail'].includes(location.pathname)) && (
+              <IconButton color="inherit" onClick={() => navigate(-1)} sx={{ mr: 1 }}>
+                {/* Using the same MenuIcon style for consistency; can swap to ArrowBack if available */}
+                <span style={{ display: 'inline-block', transform: 'rotate(180deg)' }}>➜</span>
+              </IconButton>
+            )}
             <Typography variant="subtitle1" noWrap component="div" sx={{ fontWeight: 600 }}>
               {getCurrentPageTitle()}
             </Typography>
