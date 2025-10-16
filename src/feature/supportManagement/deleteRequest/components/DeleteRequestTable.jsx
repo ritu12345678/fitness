@@ -1,25 +1,25 @@
 import React from 'react';
 import CustomTable from '../../../../components/CustomTable';
-import { Box, IconButton } from '@mui/material';
+import { Box, Avatar, IconButton } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
-const TicketTable = () => {
+const DeleteRequestTable = () => {
   const rows = Array.from({ length: 24 }).map((_, i) => ({
     id: i + 1,
-    ticketNo: '#23' + (20 + (i % 10)),
-    name: ['Cody Fisher','Eleanor Pena','Jane Cooper','Kathryn Murphy','Kristin Watson','Annette Black','Robert Fox','Ralph Edwards','Darlene Robertson'][i % 9],
+    profile: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop',
+    name: ['Beginner','Intermediate','Advanced'][i % 3],
     number: '78459612365',
-    status: i % 3 === 0 ? 'Open' : 'Close',
-    created: '21-May-2025 11:05 AM',
+    email: 'abhishekharmap@gmail.com',
+    requested: '21-May-2025 11:05 AM',
   }));
 
   const columns = [
     { key: 'id', header: '#' },
-    { key: 'ticketNo', header: 'Ticket No' },
+    { key: 'profile', header: 'Profile', render: (v) => (<Avatar src={v} sx={{ width: 28, height: 28 }} />) },
     { key: 'name', header: 'Name' },
     { key: 'number', header: 'Number' },
-    { key: 'status', header: 'Status' },
-    { key: 'created', header: 'Created Date' },
+    { key: 'email', header: 'Email' },
+    { key: 'requested', header: 'Requested Date' },
     {
       key: 'action',
       header: 'Action',
@@ -43,9 +43,6 @@ const TicketTable = () => {
   );
 };
 
-export default TicketTable;
-
-
-
+export default DeleteRequestTable;
 
 

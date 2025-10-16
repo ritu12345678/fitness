@@ -52,3 +52,6 @@ const StudioPackageTable = () => {
 export default StudioPackageTable;
 
 
+
+
+

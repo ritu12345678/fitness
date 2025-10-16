@@ -4,6 +4,10 @@ import Tab from '@mui/material/Tab';
 
 
 import GeneralTab from './GeneralTab';
+import CategoryTab from './CategoryTab';
+import PaymentTab from './PaymentTab';
+import SocialLinkTab from './SocialLinkTab';
+import WebsiteConfigTab from './WebsiteConfigTab';
 
 function Placeholder({ text }) { return <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm text-gray-500">{text}</div>; }
 
@@ -21,16 +25,19 @@ function SettingsTabs() {
       </Tabs></div>
       <div className="mt-3">
         {tab === 0 && <GeneralTab />}
-        {tab === 1 && <Placeholder text="Category settings" />}
-        {tab === 2 && <Placeholder text="Payment settings" />}
-        {tab === 3 && <Placeholder text="Social Link settings" />}
-        {tab === 4 && <Placeholder text="Website Config settings" />}
+        {tab === 1 && <CategoryTab />}
+        {tab === 2 && <PaymentTab />}
+        {tab === 3 && <SocialLinkTab />}
+        {tab === 4 && <WebsiteConfigTab />}
       </div>
     </div>
   );
 }
 
 export default SettingsTabs;
+
+
+
 
 
 

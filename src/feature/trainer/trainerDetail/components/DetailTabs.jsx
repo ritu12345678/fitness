@@ -83,7 +83,7 @@ function DetailTabs() {
 
   return (
     <div className="p-2">
-      <div className="bg-white border border-gray-200 rounded-xl py-1 px-24 shadow-sm">
+      <div className="bg-white border border-[#f8c6c6] rounded-xl py-1 px-24 shadow-sm">
         <Tabs
           value={value}
           onChange={(_e, v) => setValue(v)}
@@ -109,13 +109,54 @@ function DetailTabs() {
 
       {/* Pay Slip */}
       <Panel value={value} index={1}>
-        <div className="text-sm text-gray-500">No pay slips available yet.</div>
+        <div className='bg-white border border-[#f8c6c6] rounded-xl p-3 shadow-sm'>
+          <CustomTable
+            columns={[
+              { key: 'id', header: '#' },
+              { key: 'txnId', header: 'Transaction ID' },
+              { key: 'credited', header: 'Credited Amount' },
+              { key: 'method', header: 'Method' },
+              { key: 'salary', header: 'Salary Period' },
+              { key: 'date', header: 'Date & Time' },
+              { key: 'status', header: 'Status', render: (v) => (
+                <span className={v === 'Successful' ? 'text-green-600' : 'text-red-600'}>{v}</span>
+              )},
+            ]}
+            rows={[
+              { id: 1, txnId: '#23534564356', credited: 1000, method: 'Bank', salary: '1 March - 31 March', date: '11.30 AM 12-Apr-2024', status: 'Successful' },
+              { id: 2, txnId: '#23534564356', credited: 1000, method: 'Bank', salary: '1 February - 28 February', date: '09.50 AM 1-Feb-2024', status: 'Successful' },
+              { id: 3, txnId: '#23534564356', credited: 1000, method: 'Bank', salary: '1 January - 31 January', date: '10.45 AM 1-Jan-2024', status: 'Failed' },
+            ]}
+            keyField="id"
+            initialRowsPerPage={3}
+            rowsPerPageOptions={[3]}
+          />
+        </div>
       </Panel>
 
       {/* Batch */}
       <Panel value={value} index={2}>
-        <div className="text-sm text-gray-500">
-          Batch details will appear here.
+        <div className='bg-white border border-[#f8c6c6] rounded-xl p-3 shadow-sm'>
+          <CustomTable
+            columns={[
+              { key: 'id', header: '#' },
+              { key: 'batch', header: 'Batch Number' },
+              { key: 'package', header: 'Package' },
+              { key: 'start', header: 'Start Date' },
+              { key: 'end', header: 'End Date' },
+              { key: 'location', header: 'Location' },
+              { key: 'session', header: 'Session' },
+              { key: 'members', header: 'Total Members' },
+            ]}
+            rows={[
+              { id: 1, batch: 'Batch 1', package: '3 Month Package', start: '12-Apr-2024', end: '12-Jun-2024', location: 'Chennai', session: 36, members: 14 },
+              { id: 2, batch: 'Batch 2', package: '3 Month Package', start: '12-Apr-2024', end: '12-Jun-2024', location: 'Chennai', session: 36, members: 14 },
+              { id: 3, batch: 'Batch 3', package: '3 Month Package', start: '12-Apr-2024', end: '12-Jun-2024', location: 'Chennai', session: 36, members: 14 },
+            ]}
+            keyField="id"
+            initialRowsPerPage={3}
+            rowsPerPageOptions={[3]}
+          />
         </div>
       </Panel>
     </div>

@@ -129,7 +129,11 @@ function Layout(props) {
 
   const drawer = (
     <div>
-      <Toolbar />
+      <Toolbar sx={{ minHeight: 40 }} />
+      <Box sx={{ px: 2, py: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: 0.5 }}>Fitness</Typography>
+      </Box>
+   
       <Divider />
       <List>
         {menuItems.map((item) => {

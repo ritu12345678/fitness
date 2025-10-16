@@ -4,9 +4,9 @@ import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MenuItem from '@mui/material/MenuItem';
 
-const TicketFilter = () => {
+const DeleteRequestFilter = () => {
   const [query, setQuery] = React.useState('');
-  const [status, setStatus] = React.useState('all');
+  const [filter, setFilter] = React.useState('all');
   const [date, setDate] = React.useState('any');
 
   return (
@@ -22,8 +22,8 @@ const TicketFilter = () => {
       <div className="w-36">
         <CustomSelect
           size="small"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
           SelectProps={{
             renderValue: (val) => (
               <span className="inline-flex items-center gap-1">
@@ -39,8 +39,9 @@ const TicketFilter = () => {
               All Filter
             </span>
           </MenuItem>
-          <MenuItem value="Open">Open</MenuItem>
-          <MenuItem value="Close">Close</MenuItem>
+          <MenuItem value="Beginner">Beginner</MenuItem>
+          <MenuItem value="Intermediate">Intermediate</MenuItem>
+          <MenuItem value="Advanced">Advanced</MenuItem>
         </CustomSelect>
       </div>
       <div className="w-28">
@@ -56,9 +57,6 @@ const TicketFilter = () => {
   );
 };
 
-export default TicketFilter;
-
-
-
+export default DeleteRequestFilter;
 
 

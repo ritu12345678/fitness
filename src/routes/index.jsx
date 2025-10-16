@@ -21,6 +21,8 @@ import StudioPackagePage from '../pages/StudioPackagePage';
 import ProgramPage from '../pages/ProgramPage';
 import StudioPage from '../pages/StudioPage';
 import TicketPage from '../pages/TicketPage';
+import FaqPage from '../pages/FaqPage';
+import DeleteRequestPage from '../pages/DeleteRequestPage';
 
 
 export const router = createBrowserRouter([
@@ -50,7 +52,9 @@ export const router = createBrowserRouter([
   { path: '/setup/studio-packages', element: <Layout />, children: [{ index: true, element: <StudioPackagePage /> }] },
   { path: '/setup/program', element: <Layout />, children: [{ index: true, element: <ProgramPage /> }] },
   { path: '/setup/studio', element: <Layout />, children: [{ index: true, element: <StudioPage /> }] },
-  { path: '/support/ticket', element: <Layout />, children: [{ index: true, element: <TicketPage /> }] },
+  // { path: '/support/ticket', element: <Layout />, children: [{ index: true, element: <TicketPage /> }] },
+  // { path: '/support/faq', element: <Layout />, children: [{ index: true, element: <FaqPage /> }] },
+  // { path: '/support/delete-request', element: <Layout />, children: [{ index: true, element: <DeleteRequestPage /> }] },
 
 ]);
 
