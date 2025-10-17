@@ -41,3 +41,4 @@ const AddFaqModal = ({ open, onClose, onSave }) => {
 };
 
 export default AddFaqModal;
+

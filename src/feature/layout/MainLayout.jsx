@@ -40,6 +40,8 @@ import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import LogoutIcon from '@mui/icons-material/Logout';
+import ConfirmationModal from '../../components/ConfirmationModal';
 
 const drawerWidth = 240;
 
@@ -47,6 +49,7 @@ function Layout(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+  const [openLogoutModal, setOpenLogoutModal] = React.useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -127,6 +130,14 @@ function Layout(props) {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const handleLogout = () => {
+    // Add logout logic here
+    console.log('User logged out');
+    setOpenLogoutModal(false);
+    // You can add navigation to login page or clear user session here
+    // navigate('/login');
+  };
+
   const drawer = (
     <div>
       <Toolbar sx={{ minHeight: 40 }} />
@@ -196,6 +207,34 @@ function Layout(props) {
           </ListItem>
         );})}
       </List>
+      
+      {/* Logout Button */}
+      <Box sx={{ px: 2, pb: 2 }}>
+        <ListItemButton 
+          onClick={() => setOpenLogoutModal(true)}
+          sx={{
+            borderRadius: 1,
+            mx: 1,
+            '&:hover': { bgcolor: '#f3f4f6' },
+          }}
+        >
+          <ListItemIcon sx={{
+            minWidth: 'auto',
+            color: '#6b7280',
+            bgcolor: '#f3f4f6',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mr: 1.25,
+          }}>
+            <LogoutIcon />
+          </ListItemIcon>
+          <ListItemText primary="Log Out" sx={{ '.MuiListItemText-primary': { fontSize: 14 } }} />
+        </ListItemButton>
+      </Box>
     </div>
   );
 
@@ -296,6 +335,18 @@ function Layout(props) {
         <Toolbar />
         <Outlet />
       </Box>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmationModal
+        open={openLogoutModal}
+        onClose={() => setOpenLogoutModal(false)}
+        onConfirm={handleLogout}
+        title="Log Out"
+        message="Are you sure do you want to Log out"
+        confirmText="Yes"
+        cancelText="No"
+        confirmColor="#C82D30"
+      />
     </Box>
   );
 }
