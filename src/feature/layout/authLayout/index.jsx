@@ -154,8 +154,8 @@ function Login() {
 
                         <div className="mt-4 p-3 bg-gray-100 rounded-md text-xs text-gray-600">
                             <strong>Demo Credentials:</strong><br />
-                            Email: admin@fitness.com<br />
-                            Password: password123
+                            Email: vanya@gmail.com<br />
+                            Password: 1234
                         </div>
                     </div>
                 </div>
