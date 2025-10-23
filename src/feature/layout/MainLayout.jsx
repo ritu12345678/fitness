@@ -42,6 +42,10 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ConfirmationModal from '../../components/ConfirmationModal';
+import GlobalLoader from '../../components/GlobalLoader';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../store/slices/authSlice';
+import { useToast } from '../../hooks/useToast';
 
 const drawerWidth = 240;
 
@@ -52,6 +56,9 @@ function Layout(props) {
   const [openLogoutModal, setOpenLogoutModal] = React.useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.auth);
+  const { showSuccess, showError } = useToast();
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -130,12 +137,16 @@ function Layout(props) {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleLogout = () => {
-    // Add logout logic here
-    console.log('User logged out');
-    setOpenLogoutModal(false);
-    // You can add navigation to login page or clear user session here
-    // navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap();
+      showSuccess('Logged out successfully!');
+      setOpenLogoutModal(false);
+      navigate('/');
+    } catch (error) {
+      showError('Logout failed. Please try again.');
+      console.error('Logout error:', error);
+    }
   };
 
   const drawer = (
@@ -212,10 +223,12 @@ function Layout(props) {
       <Box sx={{ px: 2, pb: 2 }}>
         <ListItemButton 
           onClick={() => setOpenLogoutModal(true)}
+          disabled={loading}
           sx={{
             borderRadius: 1,
             mx: 1,
             '&:hover': { bgcolor: '#f3f4f6' },
+            '&.Mui-disabled': { opacity: 0.6 },
           }}
         >
           <ListItemIcon sx={{
@@ -232,7 +245,10 @@ function Layout(props) {
           }}>
             <LogoutIcon />
           </ListItemIcon>
-          <ListItemText primary="Log Out" sx={{ '.MuiListItemText-primary': { fontSize: 14 } }} />
+          <ListItemText 
+            primary={loading ? "Logging out..." : "Log Out"} 
+            sx={{ '.MuiListItemText-primary': { fontSize: 14 } }} 
+          />
         </ListItemButton>
       </Box>
     </div>
@@ -331,7 +347,7 @@ function Layout(props) {
           {drawer}
         </Drawer>
       </Box>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, position: 'relative' }}>
         <Toolbar />
         <Outlet />
       </Box>
@@ -339,14 +355,18 @@ function Layout(props) {
       {/* Logout Confirmation Modal */}
       <ConfirmationModal
         open={openLogoutModal}
-        onClose={() => setOpenLogoutModal(false)}
+        onClose={() => !loading && setOpenLogoutModal(false)}
         onConfirm={handleLogout}
         title="Log Out"
         message="Are you sure do you want to Log out"
-        confirmText="Yes"
+        confirmText={loading ? "Logging out..." : "Yes"}
         cancelText="No"
         confirmColor="#C82D30"
+        showCloseButton={!loading}
       />
+
+      {/* Global Loader */}
+      <GlobalLoader />
     </Box>
   );
 }

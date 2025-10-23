@@ -6,11 +6,28 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import MovieEditIcon from '@mui/icons-material/MovieEdit';
 
-function DetailHeader() {
+function DetailHeader({ trainer, onEdit }) {
+  // Default trainer data if none provided
+  const defaultTrainer = {
+    name: "Abhishek Sharma",
+    email: "abhishek@gmail.com",
+    phone: "9875678818",
+    address: "123, Main Road, 625501",
+    ifsc: "SBIN000456",
+    img: "https://i.pravatar.cc/80?img=31",
+    dateOfBirth: "27 Nov 1998",
+    gender: "Male"
+  };
+
+  const trainerData = trainer || defaultTrainer;
+
   return (
     <div className="relative bg-white border border-gray-200 rounded-xl p-4 flex justify-between items-start shadow-sm">
       {/* Edit Icon */}
-      <div className="absolute top-3 right-3 text-gray-500 hover:text-blue-600 cursor-pointer">
+      <div 
+        className="absolute top-3 right-3 text-gray-500 hover:text-blue-600 cursor-pointer"
+        onClick={onEdit}
+      >
         <MovieEditIcon fontSize="small" />
       </div>
 

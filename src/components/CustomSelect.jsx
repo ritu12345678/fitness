@@ -4,10 +4,6 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
-// Reusable Select built on top of MUI Select
-// - Rounded shape and menu radius are controlled globally via theme
-// - Accepts simple `options` prop to avoid repeating MenuItem markup
-// - Forwards ref so consumers can call focus() and form libs can register it
 const CustomSelect = forwardRef(function CustomSelect(
   {
     label,

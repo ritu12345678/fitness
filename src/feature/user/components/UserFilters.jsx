@@ -4,36 +4,48 @@ import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MenuItem from '@mui/material/MenuItem';
 import AddUserModal from './AddUserModal';
-function UserFilters({ onSearch, onFilterChange }) {
-  const [query, setQuery] = React.useState('');
-  const [filter, setFilter] = React.useState('all');
-  const [date, setDate] = React.useState('any');
+import { useUrlFilters } from '../../../hooks/useUrlFilters';
 
+function UserFilters({ onFilterChange, refreshUsers }) {
+  // Define default filters
+  const defaultFilters = {
+    query: '',
+    status: 'all',
+    date: 'any'
+  };
+
+  // Use URL filters hook
+  const { filters, updateFilter, clearAllFilters, hasActiveFilters } = useUrlFilters(defaultFilters);
+
+  // Notify parent component when filters change
   React.useEffect(() => {
-    onFilterChange?.({ filter, date, query });
-  }, [filter, date, query, onFilterChange]);
+    onFilterChange?.(filters);
+  }, [filters, onFilterChange]);
 
   const [openAdd, setOpenAdd] = React.useState(false);
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex items-center gap-3">
+      {/* Search Input */}
       <div className="flex-1">
         <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={filters.query}
+          onChange={(e) => updateFilter('query', e.target.value)}
           placeholder="Search"
           className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
         />
       </div>
+      
+      {/* Status Filter */}
       <div className="w-36">
         <CustomSelect
           size="small"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          value={filters.status}
+          onChange={(e) => updateFilter('status', e.target.value)}
           SelectProps={{
             renderValue: (val) => (
               <span className="inline-flex items-center gap-1">
-                {val === 'all' && <FilterAltOutlinedIcon sx={{ fontSize: 18, color: '#9ca3af' }} />}
+                <FilterAltOutlinedIcon sx={{ fontSize: 18, color: '#9ca3af' }} />
                 {val === 'all' ? 'All Filter' : val === 'active' ? 'Active' : 'Inactive'}
               </span>
             ),
@@ -49,21 +61,57 @@ function UserFilters({ onSearch, onFilterChange }) {
           <MenuItem value="inactive">Inactive</MenuItem>
         </CustomSelect>
       </div>
+      
+      {/* Date Filter */}
       <div className="w-28">
         <CustomSelect
           size="small"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          options={[{ label: 'Date', value: 'any' }, { label: 'Today', value: 'today' }, { label: 'This week', value: 'week' }]}
+          value={filters.date}
+          onChange={(e) => updateFilter('date', e.target.value)}
+          options={[
+            { label: 'Date', value: 'any' }, 
+            { label: 'Today', value: 'today' }, 
+            { label: 'This week', value: 'week' }
+          ]}
         />
       </div>
-      <button className="rounded-2xl bg-white border border-gray-200 px-3 py-1 text-sm"><SummarizeOutlinedIcon style={{ color: "#D3D3D3" }} />Export</button>
-      <button onClick={() => setOpenAdd(true)} className=" bg-[#F6A5A5] text-black px-3 py-2 text-sm rounded-2xl">+ Add User</button>
-      <AddUserModal open={openAdd} onClose={() => setOpenAdd(false)} onSave={() => setOpenAdd(false)} />
+      
+      {/* Clear Filters Button */}
+      {hasActiveFilters && (
+        <button 
+          onClick={clearAllFilters}
+          className="rounded-2xl bg-gray-100 border border-gray-200 px-3 py-1 text-sm hover:bg-gray-200"
+        >
+          Clear
+        </button>
+      )}
+      
+      {/* Export Button */}
+      <button className="rounded-2xl bg-white border border-gray-200 px-3 py-1 text-sm">
+        <SummarizeOutlinedIcon style={{ color: "#D3D3D3" }} />
+        Export
+      </button>
+      
+      {/* Add User Button */}
+      <button 
+        onClick={() => setOpenAdd(true)} 
+        className="bg-[#F6A5A5] text-black px-3 py-2 text-sm rounded-2xl"
+      >
+        + Add User
+      </button>
+      
+      {/* Add User Modal */}
+      <AddUserModal 
+        open={openAdd} 
+        onClose={() => setOpenAdd(false)} 
+        isEdit={false}
+        onSave={() => {
+          setOpenAdd(false);
+          refreshUsers?.(); // Simple refresh call
+        }} 
+      />
     </div>
   );
 }
 
 export default UserFilters;
-
-

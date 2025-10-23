@@ -49,7 +49,9 @@ const rows = [
   },
 ];
 
-function DetailTable() {
+function DetailTable({ batch }) {
+  console.log('DetailTable received batch:', batch)
+  
   const navigate = useNavigate();
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [selectedRow, setSelectedRow] = React.useState(null);
@@ -70,9 +72,14 @@ function DetailTable() {
 
   const columns = useColumns(handleOpenMenu);
 
+  // Use batch students data or fallback to mock data
+  const studentsData = batch?.students || rows;
+  
+  console.log('DetailTable using students data:', studentsData)
+
   return (
     <>
-      <CustomTable columns={columns} data={rows} />
+      <CustomTable columns={columns} data={studentsData} />
       <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleClose}>
         <MenuItem onClick={handleDetail}>Detail</MenuItem>
       </Menu>

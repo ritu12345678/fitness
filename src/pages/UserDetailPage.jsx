@@ -1,10 +1,8 @@
-import React from 'react'
-import UserDetail from '../feature/user/userDetail'
-
+import UserDetailPage from "../feature/user/userDetail"
 const UserDetailPage = () => {
   return (
     <div>
-      <UserDetail/>
+   <UserDetailPage/>
     </div>
   )
 }

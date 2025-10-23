@@ -5,16 +5,25 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
+import { formatDate } from '../../../constants';
 
 function useColumns(onOpenMenu) {
   return [
     { key: 'id', header: '#' },
-    { key: 'batchNumber', header: 'Batch Number' },
+    { key: 'batch_id', header: 'Batch Number' },
     { key: 'trainerName', header: 'Trainer Name' },
-    { key: 'package', header: 'Package' },
-    { key: 'startDate', header: 'Start Date' },
-    { key: 'endDate', header: 'End Date' },
-    { key: 'location', header: 'Location' },
+    { key: 'starting_amount', header: 'Package' },
+    { 
+      key: 'from', 
+      header: 'Start Date',
+      render: (_v, row) => formatDate(row.from)
+    },
+    { 
+      key: 'endDate', 
+      header: 'End Date',
+      render: (_v, row) => row.endDate ? formatDate(row.endDate) : 'N/A'
+    },
+    { key: 'city', header: 'Location' },
     { key: 'sessions', header: 'Sessions' },
     { key: 'totalMembers', header: 'Total Members' },
     {
@@ -29,43 +38,17 @@ function useColumns(onOpenMenu) {
   ];
 }
 
-const rows = [
-  {
-    id: 1,
-    batchNumber: 'Batch 1',
-    trainerName: 'Abhishek Sharma',
-    package: '3 Month Package',
-    startDate: '10 Oct 2025',
-    endDate: '10 Jan 2026',
-    location: 'Delhi',
-    sessions: 36,
-    totalMembers: 12,
-  },
-  {
-    id: 2,
-    batchNumber: 'Batch 2',
-    trainerName: 'Neha Singh',
-    package: '6 Month Package',
-    startDate: '15 Oct 2025',
-    endDate: '15 Apr 2026',
-    location: 'Mumbai',
-    sessions: 72,
-    totalMembers: 20,
-  },
-  {
-    id: 3,
-    batchNumber: 'Batch 3',
-    trainerName: 'Rohit Verma',
-    package: '1 Month Package',
-    startDate: '01 Nov 2025',
-    endDate: '01 Dec 2025',
-    location: 'Pune',
-    sessions: 12,
-    totalMembers: 8,
-  },
-];
-
-function BatchTable() {
+function BatchTable({ 
+  data = [], 
+  loading = false, 
+  page = 1, 
+  pageSize = 10, 
+  totalPages = 1, 
+  totalResults = 0,
+  onPageChange,
+  onPageSizeChange,
+  onEdit
+}) {
   const navigate = useNavigate();
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [selectedRow, setSelectedRow] = React.useState(null);
@@ -81,16 +64,34 @@ function BatchTable() {
 
   const handleDetail = () => {
     handleClose();
-    navigate('/batch/detail'); // ✅ better route naming
+    navigate(`/batch/detail/${selectedRow.batch_id}`); // Pass batch ID
+  };
+
+  const handleEdit = () => {
+    if (selectedRow && onEdit) {
+      onEdit(selectedRow);
+    }
+    handleClose();
   };
 
   const columns = useColumns(handleOpenMenu);
 
   return (
     <>
-      <CustomTable columns={columns} data={rows} />
+      <CustomTable 
+        columns={columns} 
+        data={data}
+        loading={loading}
+        page={page}
+        pageSize={pageSize}
+        totalPages={totalPages}
+        totalResults={totalResults}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
       <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleClose}>
         <MenuItem onClick={handleDetail}>Detail</MenuItem>
+        <MenuItem onClick={handleEdit}>Edit</MenuItem>
       </Menu>
     </>
   );

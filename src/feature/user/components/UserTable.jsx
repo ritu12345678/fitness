@@ -9,7 +9,13 @@ import { useNavigate } from 'react-router-dom';
 
 function useColumns(onOpenMenu) {
   return [
-    { key: 'id', header: '#' },
+    { 
+      key: 'sno', 
+      header: 'S.No',
+      render: (_v, row, index) => (
+        <span>{index + 1}</span>
+      )
+    },
     {
       key: 'profile',
       header: 'Profile',
@@ -19,10 +25,22 @@ function useColumns(onOpenMenu) {
         </div>
       ),
     },
-    { key: 'name', header: 'Name' },
+    { 
+      key: 'name', 
+      header: 'Name',
+      render: (_v, row) => (
+        <span className="capitalize">{row.name}</span>
+      )
+    },
     { key: 'mobile', header: 'Mobile Number' },
     { key: 'email', header: 'Email' },
-    { key: 'location', header: 'Location' },
+    { 
+      key: 'address', 
+      header: 'Location',
+      render: (_v, row) => (
+        <span className="capitalize">{row.address}</span>
+      )
+    },
     { key: 'feesDue', header: 'Fees Due Date' },
     {
       key: 'action',
@@ -36,51 +54,100 @@ function useColumns(onOpenMenu) {
   ];
 }
 
-const rows = [
-  { id: 1, name: 'Eleanor Pena', mobile: '784532690', email: 'xxx@gmail.com', location: 'Madan', feesDue: '5', avatar: 'https://i.pravatar.cc/40?img=21' },
-  { id: 2, name: 'Theresa Webb', mobile: '784532690', email: 'xxx@gmail.com', location: 'Rathi', feesDue: '6', avatar: 'https://i.pravatar.cc/40?img=22' },
-  { id: 3, name: 'Annette Black', mobile: '784532690', email: 'xxx@gmail.com', location: 'Rathi', feesDue: '20', avatar: 'https://i.pravatar.cc/40?img=23' },
-  { id: 4, name: 'Darlene Robertson', mobile: '784532690', email: 'xxx@gmail.com', location: 'Madan', feesDue: '15', avatar: 'https://i.pravatar.cc/40?img=24' },
-  { id: 5, name: 'Devon Lane', mobile: '784532690', email: 'xxx@gmail.com', location: 'Ganezh', feesDue: '15', avatar: 'https://i.pravatar.cc/40?img=25' },
-  { id: 6, name: 'Savannah Nguyen', mobile: '784532690', email: 'xxx@gmail.com', location: 'Ganezh', feesDue: '15', avatar: 'https://i.pravatar.cc/40?img=26' },
-  { id: 7, name: 'Kristin Watson', mobile: '784532690', email: 'xxx@gmail.com', location: 'Ganezh', feesDue: '15', avatar: 'https://i.pravatar.cc/40?img=27' },
-];
-
-function UserTable() {
+function UserTable({ users, loading, error, onEdit }) {
   const navigate = useNavigate();
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [selectedRow, setSelectedRow] = React.useState(null);
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log('UserTable received users:', users);
+    console.log('Users type:', typeof users);
+    console.log('Users length:', users?.length);
+    console.log('Users is array:', Array.isArray(users));
+  }, [users]);
 
   const handleOpenMenu = (anchor, row) => {
     setMenuAnchor(anchor);
     setSelectedRow(row);
   };
+  
   const handleClose = () => {
     setMenuAnchor(null);
   };
+  
   const handleDetail = () => {
+    if (selectedRow) {
+      navigate(`/user/${selectedRow.user_id}`);
+    }
     handleClose();
-    navigate('/user/detail');
   };
+  
   const handleEdit = () => {
+    if (selectedRow && onEdit) {
+      onEdit(selectedRow);
+    }
     handleClose();
-    // Placeholder for edit action
-    navigate('/user/detail');
   };
 
   const columns = useColumns(handleOpenMenu);
 
+  // Ensure users is always an array
+  const safeUsers = Array.isArray(users) ? users : [];
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C82D30] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading users...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Users</h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-[#C82D30] text-white px-4 py-2 rounded-md hover:bg-[#A02528]"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state
+  if (!safeUsers || safeUsers.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="text-gray-400 text-6xl mb-4">👥</div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Users Found</h3>
+          <p className="text-gray-600">Try adjusting your filters or add a new user.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      <CustomTable columns={columns} data={rows} />
+      <CustomTable columns={columns} data={safeUsers} />
       <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleClose}>
         <MenuItem onClick={handleDetail}>Detail</MenuItem>
-        <MenuItem onClick={handleEdit}>Edit</MenuItem>
+        {/* <MenuItem onClick={handleEdit}>Edit</MenuItem> */}
       </Menu>
     </>
   );
 }
 
 export default UserTable;
-
-

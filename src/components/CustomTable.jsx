@@ -73,7 +73,7 @@ function CustomTable({
                   <TableCell key={(col.key || col.header) + String(row[keyField] ?? rowIndex)} className={col.className || ''}>
                     {renderCell
                       ? renderCell({ row, col, value: row[col.key], rowIndex })
-                      : (col.render ? col.render(row[col.key], row) : row[col.key])}
+                      : (col.render ? col.render(row[col.key], row, rowIndex) : row[col.key])}
                   </TableCell>
                 ))}
               </TableRow>

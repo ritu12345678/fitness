@@ -85,6 +85,25 @@ const theme = createTheme({
         },
       },
     },
+
+    // ✅ Switch component styling - Green when active
+    MuiSwitch: {
+      styleOverrides: {
+        switchBase: {
+          '&.Mui-checked': {
+            color: '#10B981', // Green color when checked
+            '&:hover': {
+              backgroundColor: 'rgba(16, 185, 129, 0.08)',
+            },
+          },
+        },
+        track: {
+          '&.Mui-checked': {
+            backgroundColor: '#10B981', // Green track when checked
+          },
+        },
+      },
+    },
   },
 });
 
