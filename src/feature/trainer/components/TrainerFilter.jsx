@@ -4,7 +4,7 @@ import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MenuItem from '@mui/material/MenuItem';
 import AddTrainerModal from './AddTrainerModal';
-function TrainerFilter({ onSearch, onFilterChange }) {
+function TrainerFilter({ onSearch, onFilterChange, refreshTrainers }) {
   const [query, setQuery] = React.useState('');
   const [filter, setFilter] = React.useState('all');
   const [date, setDate] = React.useState('any');
@@ -59,7 +59,14 @@ function TrainerFilter({ onSearch, onFilterChange }) {
       </div>
       <button className="rounded-2xl bg-white border border-gray-200 px-3 py-1 text-sm"><SummarizeOutlinedIcon style={{ color: "#D3D3D3" }} />Export</button>
       <button onClick={() => setOpenAdd(true)} className="  bg-[#F6A5A5] text-black px-3 py-2 text-sm rounded-2xl">+ Add Trainer</button>
-      <AddTrainerModal open={openAdd} onClose={() => setOpenAdd(false)} onSave={() => setOpenAdd(false)} />
+      <AddTrainerModal 
+        open={openAdd} 
+        onClose={() => setOpenAdd(false)} 
+        onSave={() => {
+          setOpenAdd(false);
+          refreshTrainers?.();
+        }} 
+      />
     </div>
   );
 }

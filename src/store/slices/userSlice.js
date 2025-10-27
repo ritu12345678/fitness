@@ -4,12 +4,25 @@ import { apiService } from '../../services/apiClient';
 // Initial state
 const initialState = {
   users: [],
+  trainers: [],
   currentUser: null,
   loading: false,
   error: null,
 };
 
 // Async thunks for API calls
+export const fetchUsersByRole = createAsyncThunk(
+  'user/fetchUsersByRole',
+  async ({ roleId, params = {} }, { rejectWithValue }) => {
+    try {
+      const response = await apiService.get(`users/role/${roleId}`, params);
+      return { roleId, data: response };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const fetchUsers = createAsyncThunk(
   'user/fetchUsers',
   async (params = {}, { rejectWithValue }) => {

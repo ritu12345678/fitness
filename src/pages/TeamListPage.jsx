@@ -1,5 +1,5 @@
 import React from 'react'
-import TeamList from '../feature/teamManagement/teamList'
+import TeamList from '../feature/teamList'
 
 const TrainerPage = () => {
   return (

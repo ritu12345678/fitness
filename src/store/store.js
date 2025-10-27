@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authSlice from './slices/authSlice';
 import dashboardSlice from './slices/dashboardSlice';
 import userSlice from './slices/userSlice';
+import roleSlice from './slices/roleSlice';
 import loaderSlice from './slices/loaderSlice';
 import locationSlice from './slices/locationSlice';
 import categorySlice from './slices/categorySlice';
@@ -14,6 +15,7 @@ export const store = configureStore({
     auth: authSlice,
     dashboard: dashboardSlice,
     user: userSlice,
+    role: roleSlice,
     loader: loaderSlice,
     location: locationSlice,
     category: categorySlice,

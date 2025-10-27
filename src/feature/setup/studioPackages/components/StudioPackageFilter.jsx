@@ -3,30 +3,30 @@ import CustomSelect from '../../../../components/CustomSelect';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MenuItem from '@mui/material/MenuItem';
-import AddStudioPackageModal from './AddStudioPackageModal';
 
-const StudioPackageFilter = () => {
-  const [query, setQuery] = React.useState('');
-  const [filter, setFilter] = React.useState('all');
-  const [date, setDate] = React.useState('any');
-  const [openAdd, setOpenAdd] = React.useState(false);
+const StudioPackageFilter = ({ filters, updateFilter, clearAllFilters, refreshPackages, onAddPackage }) => {
+
+  // Check if any filters are active
+  const hasActiveFilters = Object.values(filters).some(value => 
+    value !== undefined && value !== null && value !== '' && value !== 'all' && value !== 'any'
+  );
 
   return (
     <>
       <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex items-center gap-3">
         <div className="flex-1">
           <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search"
+            value={filters.search || ''}
+            onChange={(e) => updateFilter('search', e.target.value)}
+            placeholder="Search packages..."
             className="w-full rounded-full bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
           />
         </div>
         <div className="w-36">
           <CustomSelect
             size="small"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            value={filters.category || 'all'}
+            onChange={(e) => updateFilter('category', e.target.value)}
             SelectProps={{
               renderValue: (val) => (
                 <span className="inline-flex items-center gap-1">
@@ -50,21 +50,28 @@ const StudioPackageFilter = () => {
         <div className="w-28">
           <CustomSelect
             size="small"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+            value={filters.date || 'any'}
+            onChange={(e) => updateFilter('date', e.target.value)}
             options={[{ label: 'Date', value: 'any' }, { label: 'Today', value: 'today' }, { label: 'This week', value: 'week' }]}
           />
         </div>
         <button className="rounded-2xl bg-white border border-gray-200 px-3 py-1 text-sm"><SummarizeOutlinedIcon style={{ color: '#D3D3D3' }} />Export</button>
-        <button onClick={() => setOpenAdd(true)} className=" bg-[#F6A5A5] text-black px-3 py-2 text-sm rounded-2xl">+ Add Studio Packages</button>
+        {hasActiveFilters && (
+          <button 
+            onClick={clearAllFilters}
+            className="rounded-2xl bg-gray-100 border border-gray-200 px-3 py-1 text-sm text-gray-600 hover:bg-gray-200"
+          >
+            Clear
+          </button>
+        )}
+        <button onClick={onAddPackage} className=" bg-[#F6A5A5] text-black px-3 py-2 text-sm rounded-2xl">+ Add Studio Packages</button>
       </div>
-
-      <AddStudioPackageModal open={openAdd} onClose={() => setOpenAdd(false)} onSave={() => setOpenAdd(false)} />
     </>
   );
 };
 
 export default StudioPackageFilter;
+
 
 
 

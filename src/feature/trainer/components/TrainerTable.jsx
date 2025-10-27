@@ -35,17 +35,7 @@ function useColumns(onOpenMenu) {
   ];
 }
 
-const rows = [
-  { id: 1, name: 'Eleanor Pena', mobile: '784532690', role: 'Worker', location: 'Madan', avatar: 'https://i.pravatar.cc/40?img=21' },
-  { id: 2, name: 'Theresa Webb', mobile: '784532690', role: 'Trainer', location: 'Rathi', avatar: 'https://i.pravatar.cc/40?img=22' },
-  { id: 3, name: 'Annette Black', mobile: '784532690', role: 'Supervisor', location: 'Rathi', avatar: 'https://i.pravatar.cc/40?img=23' },
-  { id: 4, name: 'Darlene Robertson', mobile: '784532690', role: 'Worker', location: 'Madan', avatar: 'https://i.pravatar.cc/40?img=24' },
-  { id: 5, name: 'Devon Lane', mobile: '784532690', role: 'Trainer', location: 'Ganezh', avatar: 'https://i.pravatar.cc/40?img=25' },
-  { id: 6, name: 'Savannah Nguyen', mobile: '784532690', role: 'Assistant', location: 'Ganezh', avatar: 'https://i.pravatar.cc/40?img=26' },
-  { id: 7, name: 'Kristin Watson', mobile: '784532690', role: 'Worker', location: 'Ganezh', avatar: 'https://i.pravatar.cc/40?img=27' },
-];
-
-function TrainerTable() {
+function TrainerTable({ trainers = [], loading = false, error = null, onEdit }) {
   const navigate = useNavigate();
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [selectedRow, setSelectedRow] = React.useState(null);
@@ -63,14 +53,43 @@ function TrainerTable() {
   };
   const handleEdit = () => {
     handleClose();
-    navigate('/trainer/detail');
+    if (onEdit && selectedRow) {
+      onEdit(selectedRow);
+    }
   };
 
   const columns = useColumns(handleOpenMenu);
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="text-gray-500">Loading trainers...</div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
+
+  // Show no data state
+  if (!trainers || trainers.length === 0) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="text-gray-500 text-lg">No trainer found</div>
+      </div>
+    );
+  }
+
   return (
     <>
-      <CustomTable columns={columns} data={rows} />
+      <CustomTable columns={columns} rows={trainers} />
       <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleClose}>
         <MenuItem onClick={handleDetail}>Detail</MenuItem>
         <MenuItem onClick={handleEdit}>Edit</MenuItem>

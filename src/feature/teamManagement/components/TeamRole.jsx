@@ -2,18 +2,16 @@ import React, { useState } from 'react';
 import CustomTable from '../../../components/CustomTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Box, IconButton, Typography, Divider } from '@mui/material';
+import { Box, IconButton, Typography, Divider, CircularProgress } from '@mui/material';
 
-const TeamRole = () => {
-  const [roles, setRoles] = useState([
-    { id: 1, role: 'Super Admin' },
-    { id: 2, role: 'Admin' },
-    { id: 3, role: 'Manager' },
-  ]);
+const TeamRole = ({ roles = [], loading = false, error = null, onEdit }) => {
+  console.log("roles",roles)
 
   const handleEdit = (roleId) => {
-    console.log('Edit role:', roleId);
-    // Add edit functionality here
+    const role = roles.find(r => r.role_id === roleId);
+    if (role) {
+      onEdit?.(role);
+    }
   };
 
   const handleDelete = (roleId) => {
@@ -23,14 +21,28 @@ const TeamRole = () => {
 
   const columns = [
     {
-      key: 'id',
+      key: 'role_id',
       header: '#',
       className: 'text-left',
     },
     {
-      key: 'role',
+      key: 'role_name',
       header: 'Role',
       className: 'text-left',
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      className: 'text-left',
+      render: (value, row) => (
+        <span className={`px-2 py-1 rounded-xl text-xs ${
+          row.status === true || row.status === 'active' 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-gray-100 text-gray-800'
+        }`}>
+          {row.status === true || row.status === 'active' ? 'Active' : 'Inactive'}
+        </span>
+      ),
     },
     {
       key: 'actions',
@@ -39,7 +51,7 @@ const TeamRole = () => {
       render: (value, row) => (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
           <IconButton
-            onClick={() => handleEdit(row.id)}
+            onClick={() => handleEdit(row.role_id)}
             sx={{ 
               color: '#6b7280',
               padding: '4px',
@@ -59,12 +71,12 @@ const TeamRole = () => {
               gap: 0.5,
               '&:hover': { textDecoration: 'underline' }
             }}
-            onClick={() => handleEdit(row.id)}
+            onClick={() => handleEdit(row.role_id)}
           >
             Edit
           </Typography>
           <IconButton
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleDelete(row.role_id)}
             sx={{ 
               color: '#d32f2f',
               padding: '4px',
@@ -84,7 +96,7 @@ const TeamRole = () => {
               gap: 0.5,
               '&:hover': { textDecoration: 'underline' }
             }}
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleDelete(row.role_id)}
           >
             Delete
           </Typography>
@@ -92,6 +104,34 @@ const TeamRole = () => {
       ),
     },
   ];
+
+  // Loading state
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
+        <CircularProgress size={24} />
+        <Typography sx={{ ml: 2 }}>Loading roles...</Typography>
+      </Box>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
+        <Typography color="error">Error loading roles: {error}</Typography>
+      </Box>
+    );
+  }
+
+  // Empty state
+  if (roles.length === 0) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
+        <Typography color="text.secondary">No roles found</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ 
@@ -107,7 +147,7 @@ const TeamRole = () => {
         <CustomTable
           columns={columns}
           rows={roles}
-          keyField="id"
+          keyField="role_id"
           rowsPerPageOptions={[5, 10, 25]}
           initialRowsPerPage={5}
           enablePagination={true}

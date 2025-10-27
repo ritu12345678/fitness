@@ -34,6 +34,12 @@ function UserDetailPage() {
         // Call API directly in component
         const response = await apiService.get(`users/${userId}`);
 
+        // Debug: Log the full API response to see subscription data structure
+        console.log('🔍 Full User Detail API Response:', response);
+        console.log('🔍 User Data:', response?.data);
+        console.log('🔍 Subscription Data (packageMapUsers):', response?.data?.packageMapUsers);
+        console.log('🔍 All Available Fields:', Object.keys(response?.data || {}));
+
         // Set user data
         setUser(response?.data);
         setError(null);

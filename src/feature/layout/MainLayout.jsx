@@ -45,6 +45,7 @@ import ConfirmationModal from '../../components/ConfirmationModal';
 import GlobalLoader from '../../components/GlobalLoader';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
+import { fetchRoles } from '../../store/slices/roleSlice';
 import { useToast } from '../../hooks/useToast';
 
 const drawerWidth = 240;
@@ -58,7 +59,15 @@ function Layout(props) {
   const location = useLocation();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.auth);
+  const { rolesLoaded } = useSelector((state) => state.role);
   const { showSuccess, showError } = useToast();
+
+  // Fetch roles on app startup
+  React.useEffect(() => {
+    if (!rolesLoaded) {
+      dispatch(fetchRoles());
+    }
+  }, [dispatch, rolesLoaded]);
 
   const handleDrawerClose = () => {
     setIsClosing(true);

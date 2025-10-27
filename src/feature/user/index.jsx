@@ -2,10 +2,11 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import UserFilters from "./components/UserFilters";
 import UserTable from "./components/UserTable";
 import AddUserModal from "./components/AddUserModal";
-import { apiService } from "../../services/apiClient";
-import { useToast } from "../../hooks/useToast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUsersByRole } from "../../store/slices/roleSlice";
 import { showLoader, hideLoader } from "../../store/slices/loaderSlice";
+import { useToast } from "../../hooks/useToast";
+import { getUserRoleId } from "../../utils/roleHelpers";
 
 // Simple debounce function
 function debounce(fn, delay = 400) {
@@ -17,34 +18,22 @@ function debounce(fn, delay = 400) {
 }
 
 function User() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   const dispatch = useDispatch();
+  const { users, loading, error, roles, rolesLoaded } = useSelector((state) => state.role);
   const { showError } = useToast();
-
-  // Fetch users from API
-  const fetchUsers = useCallback(async (params = {}) => {
-    try {
-      setLoading(true);
-      dispatch(showLoader({ text: "Loading users...", type: "page" }));
-      const res = await apiService.get("users/all", params);
-      const data = res?.users || res?.data?.users || res?.data || res || [];
-      setUsers(Array.isArray(data) ? data : []);
-    } catch (err) {
-      showError("Failed to load users.");
-      setError(err.message);
-    } finally {
-      setLoading(false);
-      dispatch(hideLoader());
-    }
-  }, [dispatch, showError]);
-
-  // Debounced fetch to avoid multiple API calls
-  const debouncedFetch = useRef(debounce(fetchUsers, 400)).current;
+console.log(roles)
+  // Debounced fetch function
+  const debouncedFetch = useRef(
+    debounce(async (params = {}) => {
+      const userRoleId = getUserRoleId(roles);
+      if (userRoleId) {
+        dispatch(fetchUsersByRole({ roleId: userRoleId, params }));
+      }
+    }, 400)
+  ).current;
 
   // Handle filter changes (search, status, etc.)
   const handleFilterChange = useCallback((filters) => {
@@ -65,13 +54,20 @@ function User() {
 
     // Use debounced API call
     debouncedFetch(params);
-  }, []); // Empty dependency array - function never changes
+  }, [debouncedFetch]);
+
   const handleAddUser = () => {
     setSelectedUser(null);
     setModalOpen(true);
   };
+
   // Refresh immediately (used after add/edit)
-  const refreshUsers = useCallback(() => fetchUsers(), [fetchUsers]);
+  const refreshUsers = useCallback(() => {
+    const userRoleId = getUserRoleId(roles);
+    if (userRoleId) {
+      dispatch(fetchUsersByRole({ roleId: userRoleId }));
+    }
+  }, [dispatch, roles]);
 
   // Open modal for edit
   const handleEditUser = (user) => {
@@ -79,10 +75,15 @@ function User() {
     setModalOpen(true);
   };
 
-  // Initial load
+  // Fetch users when roles are loaded
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (rolesLoaded && roles.length > 0) {
+      const userRoleId = getUserRoleId(roles);
+      if (userRoleId) {
+        dispatch(fetchUsersByRole({ roleId: userRoleId }));
+      }
+    }
+  }, [rolesLoaded, roles, dispatch]);
 
   return (
     <div className="space-y-4">
