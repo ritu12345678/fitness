@@ -3,8 +3,9 @@ import CustomSelect from '../../../../components/CustomSelect';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MenuItem from '@mui/material/MenuItem';
+import DateRangePicker from '../../../../components/DateRangePicker';
 
-const StudioPackageFilter = ({ filters, updateFilter, clearAllFilters, refreshPackages, onAddPackage }) => {
+const StudioPackageFilter = ({ filters, updateFilter, updateMultipleFilters, clearAllFilters, refreshPackages, onAddPackage }) => {
 
   // Check if any filters are active
   const hasActiveFilters = Object.values(filters).some(value => 
@@ -47,12 +48,26 @@ const StudioPackageFilter = ({ filters, updateFilter, clearAllFilters, refreshPa
             <MenuItem value="Advanced">Advanced</MenuItem>
           </CustomSelect>
         </div>
-        <div className="w-28">
-          <CustomSelect
-            size="small"
-            value={filters.date || 'any'}
-            onChange={(e) => updateFilter('date', e.target.value)}
-            options={[{ label: 'Date', value: 'any' }, { label: 'Today', value: 'today' }, { label: 'This week', value: 'week' }]}
+        {/* Date Range Filter */}
+        <div>
+          <DateRangePicker
+            startDate={filters.start_date}
+            endDate={filters.end_date}
+            onChange={(startDate, endDate) => {
+              console.log('🎯 Received dates from DateRangePicker:', { startDate, endDate });
+              
+              // Update both dates in a single batch to avoid race conditions
+              updateMultipleFilters({
+                start_date: startDate,
+                end_date: endDate
+              });
+              
+              console.log('✅ Updated filters - start_date:', startDate, 'end_date:', endDate);
+            }}
+            onClear={() => {
+              updateFilter('start_date', '');
+              updateFilter('end_date', '');
+            }}
           />
         </div>
         <button className="rounded-2xl bg-white border border-gray-200 px-3 py-1 text-sm"><SummarizeOutlinedIcon style={{ color: '#D3D3D3' }} />Export</button>

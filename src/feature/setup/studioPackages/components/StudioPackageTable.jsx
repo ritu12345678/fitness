@@ -3,7 +3,15 @@ import CustomTable from '../../../../components/CustomTable';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
-const StudioPackageTable = ({ packages = [], onEdit }) => {
+const StudioPackageTable = ({ 
+  packages = [], 
+  onEdit,
+  pagination = {},
+  onPageChange,
+  onRowsPerPageChange,
+  page = 0,
+  rowsPerPage = 10
+}) => {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -93,9 +101,14 @@ const StudioPackageTable = ({ packages = [], onEdit }) => {
         columns={columns}
         rows={rows}
         keyField="id"
-        initialRowsPerPage={10}
-        rowsPerPageOptions={[5, 10, 25]}
+        initialRowsPerPage={rowsPerPage}
+        rowsPerPageOptions={[5, 10, 25, 50]}
         enablePagination
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={onPageChange}
+        onRowsPerPageChange={onRowsPerPageChange}
+        count={pagination?.total_items || rows.length}
       />
       
       {/* Action Menu */}

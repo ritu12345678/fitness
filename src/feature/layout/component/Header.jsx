@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -8,15 +8,31 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Divider
+  Divider,
+  CircularProgress
 } from '@mui/material';
 import {
   KeyboardArrowDown
 } from '@mui/icons-material';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUserProfile, logout } from '../../../store/slices/authSlice';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '../../../hooks/useToast';
 
 const Header = ({ drawerWidth, pageTitle = "Overview" }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user, loading } = useSelector((state) => state.auth);
+  const { showSuccess, showError } = useToast();
+
+  // Fetch user profile on mount
+  useEffect(() => {
+    if (!user) {
+      dispatch(getUserProfile());
+    }
+  }, [dispatch, user]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -24,6 +40,54 @@ const Header = ({ drawerWidth, pageTitle = "Overview" }) => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap();
+      showSuccess('Logged out successfully!');
+      handleClose();
+      navigate('/login');
+    } catch (error) {
+      showError('Logout failed. Please try again.');
+      console.error('Logout error:', error);
+    }
+  };
+
+  const handleProfile = () => {
+    handleClose();
+    // Navigate to profile page if you have one
+    console.log('Navigate to profile');
+  };
+
+  const handleSettings = () => {
+    handleClose();
+    navigate('/settings');
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user) return 'U';
+    const firstName = user.firstName || user.name || user.fullName || '';
+    const lastName = user.lastName || '';
+    if (firstName && lastName) {
+      return `${firstName[0]}${lastName[0]}`.toUpperCase();
+    }
+    return firstName[0]?.toUpperCase() || 'U';
+  };
+
+  // Get display name
+  const getDisplayName = () => {
+    if (!user) return 'Loading...';
+    return user.firstName && user.lastName 
+      ? `${user.firstName} ${user.lastName}`
+      : user.name || user.fullName || user.email?.split('@')[0] || 'User';
+  };
+
+  // Get display email
+  const getDisplayEmail = () => {
+    if (!user) return 'Loading...';
+    return user.email || 'No email';
   };
 
   return (
@@ -89,7 +153,7 @@ const Header = ({ drawerWidth, pageTitle = "Overview" }) => {
                 margin: 0,
               }}
             >
-              Filippo Inzaghi
+              {getDisplayName()}
             </Typography>
             <Typography
               variant="body2"
@@ -100,23 +164,27 @@ const Header = ({ drawerWidth, pageTitle = "Overview" }) => {
                 margin: 0,
               }}
             >
-              filizonghi@finsight.co
+              {getDisplayEmail()}
             </Typography>
           </Box>
 
           {/* Avatar */}
-          <Avatar
-            sx={{
-              width: '2.5rem',
-              height: '2.5rem',
-              backgroundColor: '#f3f4f6',
-              color: '#6b7280',
-              fontSize: '1rem',
-              fontWeight: 500,
-            }}
-          >
-            F
-          </Avatar>
+          {loading ? (
+            <CircularProgress size={24} sx={{ mx: 2 }} />
+          ) : (
+            <Avatar
+              sx={{
+                width: '2.5rem',
+                height: '2.5rem',
+                backgroundColor: '#f3f4f6',
+                color: '#6b7280',
+                fontSize: '1rem',
+                fontWeight: 500,
+              }}
+            >
+              {getUserInitials()}
+            </Avatar>
+          )}
 
           {/* Dropdown Arrow */}
           <IconButton
@@ -144,15 +212,17 @@ const Header = ({ drawerWidth, pageTitle = "Overview" }) => {
             }
           }}
         >
-          <MenuItem onClick={handleClose}>
+          <MenuItem onClick={handleProfile}>
             <Typography variant="body2">Profile</Typography>
           </MenuItem>
-          <MenuItem onClick={handleClose}>
+          <MenuItem onClick={handleSettings}>
             <Typography variant="body2">Settings</Typography>
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleClose}>
-            <Typography variant="body2" color="error">Logout</Typography>
+          <MenuItem onClick={handleLogout} disabled={loading}>
+            <Typography variant="body2" color="error">
+              {loading ? 'Logging out...' : 'Logout'}
+            </Typography>
           </MenuItem>
         </Menu>
       </Toolbar>

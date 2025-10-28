@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import FeedbackFilter from './components/FeedbackFilter';
 import FeedbackTable from './components/FeedbackTable';
+import ViewFeedbackModal from './components/ViewFeedbackModal';
 import PaginationBar from '../banner/components/PaginationBar';
 import { apiService } from '../../services/apiClient';
 import { useToast } from '../../hooks/useToast';
@@ -23,6 +24,8 @@ function FeedbackFeature() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [totalResults, setTotalResults] = useState(0);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState('');
   
   const dispatch = useDispatch();
   const { showError } = useToast();
@@ -89,7 +92,7 @@ function FeedbackFeature() {
         page,
         pageSize
       });
-      const feedbacksData = response?.data?.feedbacks || response?.feedbacks || response || [];
+      const feedbacksData = response?.data|| [];
       setFeedbacks(Array.isArray(feedbacksData) ? feedbacksData : []);
       
       if (response?.pagination) {
@@ -118,6 +121,12 @@ function FeedbackFeature() {
     debouncedFetch({ page: 1, pageSize: newPageSize });
   }, [debouncedFetch]);
 
+  // Handle view review
+  const handleViewReview = (review) => {
+    setSelectedReview(review);
+    setViewModalOpen(true);
+  };
+
   // Initial load
   useEffect(() => {
     const loadFeedbacks = async () => {
@@ -127,7 +136,7 @@ function FeedbackFeature() {
           page,
           pageSize
         });
-        const feedbacksData = response?.data?.feedbacks || response?.feedbacks || response || [];
+        const feedbacksData = response?.data|| [];
         setFeedbacks(Array.isArray(feedbacksData) ? feedbacksData : []);
         
         if (response?.pagination) {
@@ -157,6 +166,7 @@ function FeedbackFeature() {
         feedbacks={feedbacks}
         loading={loading}
         error={error}
+        onViewReview={handleViewReview}
       />
       <PaginationBar
         currentPage={page}
@@ -165,6 +175,15 @@ function FeedbackFeature() {
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         totalResults={totalResults}
+      />
+
+      <ViewFeedbackModal
+        open={viewModalOpen}
+        onClose={() => {
+          setViewModalOpen(false);
+          setSelectedReview('');
+        }}
+        feedback={{ review: selectedReview }}
       />
     </div>
   );

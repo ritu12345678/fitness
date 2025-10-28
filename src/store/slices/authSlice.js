@@ -82,12 +82,13 @@ export const logout = createAsyncThunk(
   }
 );
 
-// Async thunk for getting current user
-export const getCurrentUser = createAsyncThunk(
-  'auth/getCurrentUser',
+
+// Async thunk for getting user profile
+export const getUserProfile = createAsyncThunk(
+  'auth/getUserProfile',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await apiService.get('users/me');
+      const response = await apiService.get('users/profile');
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -160,24 +161,19 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
       
-      // Get current user
-      .addCase(getCurrentUser.pending, (state) => {
+      // Get user profile
+      .addCase(getUserProfile.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getCurrentUser.fulfilled, (state, action) => {
+      .addCase(getUserProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload?.data?.user;
         state.error = null;
       })
-      .addCase(getCurrentUser.rejected, (state, action) => {
+      .addCase(getUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        // If getting current user fails, user might not be authenticated
-        state.isAuthenticated = false;
-        state.token = null;
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
       })
       
       // Forgot password

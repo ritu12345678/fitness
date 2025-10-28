@@ -1,19 +1,26 @@
 import React from 'react';
-import CustomTable from '../../../components/CustomTable';
 import UserAvatar from '../../../components/UserAvatar';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
-
-function useColumns(onOpenMenu) {
+import { formatDate } from "../../../constantFunctions";
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+function useColumns(onOpenMenu, page, rowsPerPage) {
   return [
     { 
       key: 'sno', 
       header: 'S.No',
       render: (_v, row, index) => (
-        <span>{index + 1}</span>
+        <span>{page * rowsPerPage + index + 1}</span>
       )
     },
     {
@@ -38,10 +45,12 @@ function useColumns(onOpenMenu) {
       key: 'address', 
       header: 'Location',
       render: (_v, row) => (
-        <span className="capitalize">{row.address}</span>
+        <span className="capitalize">{row.location_id_data?.name||"--"}</span>
       )
     },
-    { key: 'feesDue', header: 'Fees Due Date' },
+    { key: 'fees_due_date', header: 'Fees Due Date',render: (_v, row) => (
+       formatDate(row?.fees_due_date)
+      )  },
     {
       key: 'action',
       header: 'Action',
@@ -54,7 +63,17 @@ function useColumns(onOpenMenu) {
   ];
 }
 
-function UserTable({ users, loading, error, onEdit }) {
+function UserTable({ 
+  users, 
+  loading, 
+  error, 
+  onEdit,
+  pagination = {},
+  onPageChange,
+  onRowsPerPageChange,
+  page = 0,
+  rowsPerPage = 10
+}) {
   const navigate = useNavigate();
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [selectedRow, setSelectedRow] = React.useState(null);
@@ -90,7 +109,7 @@ function UserTable({ users, loading, error, onEdit }) {
     handleClose();
   };
 
-  const columns = useColumns(handleOpenMenu);
+  const columns = useColumns(handleOpenMenu, page, rowsPerPage);
 
   // Ensure users is always an array
   const safeUsers = Array.isArray(users) ? users : [];
@@ -141,7 +160,41 @@ function UserTable({ users, loading, error, onEdit }) {
 
   return (
     <>
-      <CustomTable columns={columns} data={safeUsers} />
+      <Paper variant="outlined" sx={{ width: '100%', borderRadius: 2 }}>
+        <TableContainer sx={{ maxHeight: 420 }}>
+          <Table stickyHeader size="medium">
+            <TableHead>
+              <TableRow>
+                {columns.map((col) => (
+                  <TableCell key={col.key || col.header} sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                    {col.header}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {safeUsers.map((row, rowIndex) => (
+                <TableRow hover key={row.user_id ?? JSON.stringify(row)}>
+                  {columns.map((col) => (
+                    <TableCell key={(col.key || col.header) + String(row.user_id ?? rowIndex)} className={col.className || ''}>
+                      {col.render ? col.render(row[col.key], row, rowIndex) : row[col.key]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          component="div"
+          count={pagination?.total_items || 0}
+          page={page}
+          onPageChange={onPageChange}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={onRowsPerPageChange}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+        />
+      </Paper>
       <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleClose}>
         <MenuItem onClick={handleDetail}>Detail</MenuItem>
         {/* <MenuItem onClick={handleEdit}>Edit</MenuItem> */}

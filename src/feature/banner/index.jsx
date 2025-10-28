@@ -16,7 +16,7 @@ const Banner = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(9);
+  const [rowsPerPage, setRowsPerPage] = useState(9);
   const [totalResults, setTotalResults] = useState(0);
   const [editingBanner, setEditingBanner] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -25,7 +25,8 @@ const Banner = () => {
   const defaultFilters = {
     query: '',
     filter: 'all',
-    date: 'any'
+    start_date: '',
+    end_date: ''
   };
 
   // Use URL filters hook
@@ -44,11 +45,13 @@ const Banner = () => {
         
         console.log('✅ API RESPONSE:', response);
         
-        const bannersData = response?.data?.banners || response?.banners || response?.data || response || [];
+        // Handle paginated response structure
+        const bannersData = response?.data || response || [];
         setBanners(Array.isArray(bannersData) ? bannersData : []);
         
+        // Extract pagination metadata from API response
         if (response?.pagination) {
-          setTotalResults(response.pagination.totalResults || bannersData.length);
+          setTotalResults(response.pagination.total_items || bannersData.length);
         } else {
           setTotalResults(bannersData.length);
         }
@@ -67,7 +70,7 @@ const Banner = () => {
   const handleFilterChange = useCallback(() => {
     const params = {
       page: 1, // Reset to first page when filtering
-      pageSize: pageSize
+      limit: rowsPerPage
     };
     
     // Add filter parameters to API call
@@ -76,11 +79,16 @@ const Banner = () => {
     }
     
     if (filters.filter && filters.filter !== 'all') {
-      params.status = filters.filter;
+      params.status = filters.filter === 'active' ? true : false;
     }
     
-    if (filters.date && filters.date !== 'any') {
-      params.date = filters.date;
+    // Handle date range - only add if both dates exist
+    if (filters.start_date && filters.start_date !== '') {
+      params.start_date = filters.start_date;
+    }
+    
+    if (filters.end_date && filters.end_date !== '') {
+      params.end_date = filters.end_date;
     }
 
     // Reset page to 1 when filtering
@@ -88,7 +96,7 @@ const Banner = () => {
     
     console.log('🔄 Filter changed, calling API with params:', params);
     debouncedFetchBannersRef.current(params);
-  }, [filters, pageSize]);
+  }, [filters, rowsPerPage]);
 
   // Watch for filter changes and trigger API call
   useEffect(() => {
@@ -103,14 +111,16 @@ const Banner = () => {
         
         const response = await apiService.get('admin/bannermanagements', {
           page: 1,
-          pageSize: pageSize
+          limit: rowsPerPage
         });
         
-        const bannersData = response?.data?.banners || response?.banners || response?.data || response || [];
+        // Handle paginated response structure
+        const bannersData = response?.data || response || [];
         setBanners(Array.isArray(bannersData) ? bannersData : []);
         
+        // Extract pagination metadata from API response
         if (response?.pagination) {
-          setTotalResults(response.pagination.totalResults || bannersData.length);
+          setTotalResults(response.pagination.total_items || bannersData.length);
         } else {
           setTotalResults(bannersData.length);
         }
@@ -131,15 +141,63 @@ const Banner = () => {
   const handlePageChange = (newPage) => {
     console.log('📄 Page changed to:', newPage);
     setPage(newPage);
-    debouncedFetchBannersRef.current({ page: newPage, pageSize });
+    
+    const params = {
+      page: newPage,
+      limit: rowsPerPage
+    };
+    
+    // Add filter parameters if they exist
+    if (filters.query) {
+      params.search = filters.query;
+    }
+    
+    if (filters.filter && filters.filter !== 'all') {
+      params.status = filters.filter === 'active' ? true : false;
+    }
+    
+    // Handle date range - only add if both dates exist
+    if (filters.start_date && filters.start_date !== '') {
+      params.start_date = filters.start_date;
+    }
+    
+    if (filters.end_date && filters.end_date !== '') {
+      params.end_date = filters.end_date;
+    }
+    
+    debouncedFetchBannersRef.current(params);
   };
 
   // Handle page size change
-  const handlePageSizeChange = (newPageSize) => {
+  const handleRowsPerPageChange = (newPageSize) => {
     console.log('📊 Page size changed to:', newPageSize);
-    setPageSize(newPageSize);
+    setRowsPerPage(newPageSize);
     setPage(1);
-    debouncedFetchBannersRef.current({ page: 1, pageSize: newPageSize });
+    
+    const params = {
+      page: 1,
+      limit: newPageSize
+    };
+    
+    // Add filter parameters if they exist
+    if (filters.query) {
+      params.search = filters.query;
+    }
+    
+    if (filters.filter && filters.filter !== 'all') {
+      params.status = filters.filter === 'active' ? true : false;
+    }
+    
+    // Handle date range - only add if both dates exist
+    if (filters.start_date && filters.start_date !== '') {
+      params.start_date = filters.start_date;
+    }
+    
+    if (filters.end_date && filters.end_date !== '') {
+      params.end_date = filters.end_date;
+    }
+    
+    debouncedFetchBannersRef.current(params);
   };
 
   // Handle banner toggle
@@ -207,15 +265,38 @@ const Banner = () => {
   // Handle banner creation - refresh the banner list
   const handleBannerCreated = useCallback(async (bannerData) => {
     try {
+      const params = {
+        page: 1,
+        limit: rowsPerPage
+      };
+      
+      // Add filter parameters if they exist
+      if (filters.query) {
+        params.search = filters.query;
+      }
+      
+      if (filters.filter && filters.filter !== 'all') {
+        params.status = filters.filter === 'active' ? true : false;
+      }
+      
+      // Handle date range - only add if both dates exist
+      if (filters.start_date && filters.start_date !== '') {
+        params.start_date = filters.start_date;
+      }
+      
+      if (filters.end_date && filters.end_date !== '') {
+        params.end_date = filters.end_date;
+      }
+      
       // Refresh the banner list after successful creation
-      debouncedFetchBannersRef.current({ page: 1, pageSize });
+      debouncedFetchBannersRef.current(params);
     } catch (error) {
       showError('Failed to refresh banner list. Please try again.');
       console.error('Banner refresh error:', error);
     }
-  }, [pageSize, showError]);
+  }, [rowsPerPage, showError, filters]);
 
-  const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
+  const totalPages = Math.max(1, Math.ceil(totalResults / rowsPerPage));
 
   if (error) {
     return (
@@ -224,7 +305,7 @@ const Banner = () => {
           Error: {error}
         </div>
         <button 
-          onClick={() => debouncedFetchBannersRef.current({ page: 1, pageSize })}
+          onClick={() => debouncedFetchBannersRef.current({ page: 1, limit: rowsPerPage })}
           className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Retry
@@ -247,9 +328,9 @@ const Banner = () => {
       <PaginationBar
         currentPage={page}
         totalPages={totalPages}
-        pageSize={pageSize}
+        pageSize={rowsPerPage}
         onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
+        onPageSizeChange={handleRowsPerPageChange}
         totalResults={totalResults}
       />
 

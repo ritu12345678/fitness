@@ -4,18 +4,20 @@ import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MenuItem from '@mui/material/MenuItem';
 import AddBatchModal from './AddBatchModal';
+import DateRangePicker from '../../../components/DateRangePicker';
 import { useUrlFilters } from '../../../hooks/useUrlFilters';
 
 function BatchFilter({ onBatchCreated }) {
-  // Define default filters
+  // Define default filters with start_date and end_date
   const defaultFilters = {
     query: '',
     filter: 'all',
-    date: 'any'
+    start_date: '',
+    end_date: ''
   };
 
   // Use URL filters hook
-  const { filters, updateFilter, clearAllFilters, hasActiveFilters } = useUrlFilters(defaultFilters);
+  const { filters, updateFilter, updateMultipleFilters, clearAllFilters, hasActiveFilters } = useUrlFilters(defaultFilters);
 
   const [openAdd, setOpenAdd] = React.useState(false);
 
@@ -57,17 +59,26 @@ function BatchFilter({ onBatchCreated }) {
         </CustomSelect>
       </div>
       
-      {/* Date Filter */}
-      <div className="w-28">
-        <CustomSelect
-          size="small"
-          value={filters.date}
-          onChange={(e) => updateFilter('date', e.target.value)}
-          options={[
-            { label: 'Date', value: 'any' }, 
-            { label: 'Today', value: 'today' }, 
-            { label: 'This week', value: 'week' }
-          ]}
+      {/* Date Range Filter */}
+      <div>
+        <DateRangePicker
+          startDate={filters.start_date}
+          endDate={filters.end_date}
+          onChange={(startDate, endDate) => {
+            console.log('🎯 Received dates from DateRangePicker:', { startDate, endDate });
+            
+            // Update both dates in a single batch to avoid race conditions
+            updateMultipleFilters({
+              start_date: startDate,
+              end_date: endDate
+            });
+            
+            console.log('✅ Updated filters - start_date:', startDate, 'end_date:', endDate);
+          }}
+          onClear={() => {
+            updateFilter('start_date', '');
+            updateFilter('end_date', '');
+          }}
         />
       </div>
       

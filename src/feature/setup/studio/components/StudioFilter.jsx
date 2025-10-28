@@ -4,8 +4,9 @@ import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MenuItem from '@mui/material/MenuItem';
 import StudioModal from './StudioModal';
+import DateRangePicker from '../../../../components/DateRangePicker';
 
-const StudioFilter = ({ refreshStudios, filters, updateFilter, clearFilters, onFilterChange }) => {
+const StudioFilter = ({ refreshStudios, filters, updateFilter, updateMultipleFilters, clearFilters, onFilterChange }) => {
   const [openAdd, setOpenAdd] = React.useState(false);
 
   // Notify parent component when filters change
@@ -13,7 +14,7 @@ const StudioFilter = ({ refreshStudios, filters, updateFilter, clearFilters, onF
     onFilterChange?.(filters);
   }, [filters, onFilterChange]);
 
-  const hasActiveFilters = filters.query || (filters.status && filters.status !== 'all') || (filters.date && filters.date !== 'any');
+  const hasActiveFilters = filters.query || (filters.status && filters.status !== 'all') || (filters.start_date && filters.end_date);
 
   return (
     <>
@@ -50,16 +51,26 @@ const StudioFilter = ({ refreshStudios, filters, updateFilter, clearFilters, onF
             <MenuItem value="Inactive">Inactive</MenuItem>
           </CustomSelect>
         </div>
-        <div className="w-28">
-          <CustomSelect
-            size="small"
-            value={filters.date || 'any'}
-            onChange={(e) => updateFilter('date', e.target.value)}
-            options={[
-              { label: 'Date', value: 'any' }, 
-              { label: 'Today', value: 'today' }, 
-              { label: 'This week', value: 'week' }
-            ]}
+        {/* Date Range Filter */}
+        <div>
+          <DateRangePicker
+            startDate={filters.start_date}
+            endDate={filters.end_date}
+            onChange={(startDate, endDate) => {
+              console.log('🎯 Received dates from DateRangePicker:', { startDate, endDate });
+              
+              // Update both dates in a single batch to avoid race conditions
+              updateMultipleFilters({
+                start_date: startDate,
+                end_date: endDate
+              });
+              
+              console.log('✅ Updated filters - start_date:', startDate, 'end_date:', endDate);
+            }}
+            onClear={() => {
+              updateFilter('start_date', '');
+              updateFilter('end_date', '');
+            }}
           />
         </div>
         <button className="rounded-2xl bg-white border border-gray-200 px-3 py-1 text-sm">

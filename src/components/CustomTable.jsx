@@ -25,23 +25,49 @@ function CustomTable({
   containerSx,
   enablePagination = true,
   renderCell,
+  // Server-side pagination props
+  page: externalPage,
+  rowsPerPage: externalRowsPerPage,
+  onPageChange: externalOnPageChange,
+  onRowsPerPageChange: externalOnRowsPerPageChange,
+  count: externalCount,
 }) {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(initialRowsPerPage);
+  // Use external pagination state if provided (server-side), otherwise use internal state (client-side)
+  const isServerSide = externalPage !== undefined;
+  const [internalPage, setInternalPage] = React.useState(0);
+  const [internalRowsPerPage, setInternalRowsPerPage] = React.useState(initialRowsPerPage);
+  
+  const page = isServerSide ? externalPage : internalPage;
+  const rowsPerPage = isServerSide ? externalRowsPerPage : internalRowsPerPage;
 
-  const handleChangePage = (_event, newPage) => {
-    setPage(newPage);
+  const handleChangePage = (event, newPage) => {
+    if (isServerSide && externalOnPageChange) {
+      externalOnPageChange(event, newPage);
+    } else {
+      setInternalPage(newPage);
+    }
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    if (isServerSide && externalOnRowsPerPageChange) {
+      externalOnRowsPerPageChange(event);
+    } else {
+      setInternalRowsPerPage(newRowsPerPage);
+      setInternalPage(0);
+    }
   };
 
   const rowData = Array.isArray(rows) ? rows : (Array.isArray(data) ? data : []);
 
-  const start = page * rowsPerPage;
-  const visibleRows = enablePagination && rowsPerPage > 0 ? rowData.slice(start, start + rowsPerPage) : rowData;
+  // For server-side pagination, don't slice - use data as-is
+  // For client-side pagination, slice the data
+  const visibleRows = (isServerSide || !enablePagination) 
+    ? rowData 
+    : (rowsPerPage > 0 ? rowData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : rowData);
+  
+  // Use external count for server-side pagination, otherwise use data length
+  const paginationCount = isServerSide && externalCount !== undefined ? externalCount : rowData.length;
 
   return (
     <Paper variant="outlined" sx={{ width: '100%', borderRadius: 2 }}>
@@ -85,7 +111,7 @@ function CustomTable({
         <TablePagination
           component="div"
           rowsPerPageOptions={rowsPerPageOptions}
-          count={rowData.length}
+          count={paginationCount}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

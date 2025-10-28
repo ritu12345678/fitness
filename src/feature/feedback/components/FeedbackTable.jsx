@@ -2,32 +2,40 @@ import React from 'react';
 import CustomTable from '../../../components/CustomTable';
 import { Box, Typography, CircularProgress } from '@mui/material';
 
-const columns = [
-  { header: 'Student Name', key: 'student' },
-  { header: 'Trainer Name', key: 'trainer' },
-  { header: 'Package', key: 'package' },
-  { header: 'Location', key: 'location' },
-  { header: 'Review', key: 'status' },
-  { header: 'Action', key: 'action' },
-];
-
-function Pill({ text }) {
-  const tone = text === 'New' ? 'red' : 'gray';
-  const cls = tone === 'red' ? 'bg-[#F6A5A5] text-black' : 'bg-gray-200 text-gray-800';
-  return <span className={`px-2 py-1 rounded-xl text-xs ${cls}`}>{text}</span>;
-}
-
-function FeedbackTable({ feedbacks = [], loading = false, error = null }) {
+function FeedbackTable({ feedbacks = [], loading = false, error = null, onViewReview }) {
   // Transform API data to table format
   const rows = feedbacks.map((feedback, index) => ({
-    id: feedback.id || feedback._id || index,
-    student: feedback.student_name || feedback.studentName || feedback.student || 'N/A',
-    trainer: feedback.trainer_name || feedback.trainerName || feedback.trainer || 'N/A',
-    package: feedback.package_name || feedback.packageName || feedback.package || 'N/A',
-    location: feedback.location_name || feedback.locationName || feedback.location || 'N/A',
-    status: feedback.status || feedback.review_status || 'New',
+    no: index+1,
+    user: feedback?.created_by_data?.name || 'N/A',
+    trainer: feedback?.trainer_data?.name || 'N/A',
+    package: feedback?.package_data?.name || 'N/A',
+    location: feedback?.location_data?.name || 'N/A',
+    review: "View",
+    reviewData: feedback?.review || feedback?.feedback || '', // Store actual review data
+    status: feedback?.status || feedback.review_status || 'New',
     action: '...'
   }));
+
+  const columns = [
+    { header: '#', key: 'no' },
+    { header: 'User Name', key: 'user' },
+    { header: 'Trainer Name', key: 'trainer' },
+    { header: 'Package', key: 'package' },
+    { header: 'Location', key: 'location' },
+    { 
+      header: 'Review', 
+      key: 'review',
+      renderCell: ({ value, row }) => (
+        <button
+          onClick={() => onViewReview?.(row.reviewData)}
+          className="px-3 py-1 rounded-xl text-sm bg-[#F6A5A5] text-white hover:bg-[#f5a0a0] transition-colors"
+        >
+          View
+        </button>
+      )
+    },
+    { header: 'Action', key: 'action' },
+  ];
 
   // Loading state
   if (loading) {
@@ -65,8 +73,11 @@ function FeedbackTable({ feedbacks = [], loading = false, error = null }) {
       stickyHeader
       initialRowsPerPage={5}
       rowsPerPageOptions={[5, 10, 20]}
-      renderCell={({ col, value }) => {
-        if (col.key === 'status') return <Pill text={value} />;
+      renderCell={({ col, value, row }) => {
+        // Use custom renderer if provided
+        if (col.renderCell) {
+          return col.renderCell({ value, row });
+        }
         if (col.key === 'action') return <span className="text-gray-400">...</span>;
         return value;
       }}

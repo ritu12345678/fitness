@@ -1,34 +1,65 @@
 import React from 'react';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const FaqList = () => {
-  const faqs = Array.from({ length: 5 }).map((_, i) => ({
-    id: i + 1,
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra condimentum eget purus in. Consectetur e...',
-  }));
+const FaqList = ({ faqs = [], loading = false, error = null, totalResults = 0, onView, onEdit }) => {
+  console.log('📋 FaqList - faqs:', faqs);
+
+  // Loading state
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
+        <CircularProgress size={24} />
+        <Typography sx={{ ml: 2 }}>Loading FAQs...</Typography>
+      </Box>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
+        <Typography color="error">Error loading FAQs: {error}</Typography>
+      </Box>
+    );
+  }
+
+  // Empty state
+  if (faqs.length === 0) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
+        <Typography color="text.secondary">No FAQs found</Typography>
+      </Box>
+    );
+  }
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
       <div className="p-4">
-        {faqs.map((faq) => (
-          <div key={faq.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+        {faqs.map((faq, index) => (
+          <div key={faq.faq_id || faq.id || faq._id || index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
             <Typography sx={{ fontSize: '14px', color: '#374151', flex: 1 }}>
-              {faq.text}
+              {faq.description || 'N/A'}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}>
                 <AddIcon sx={{ fontSize: 16, color: '#6b7280' }} />
                 <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>Add</Typography>
               </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}>
+              <Box 
+                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}
+                onClick={() => onView?.(faq)}
+              >
                 <VisibilityIcon sx={{ fontSize: 16, color: '#11968A' }} />
                 <Typography sx={{ fontSize: '12px', color: '#11968A' }}>View</Typography>
               </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}>
+              <Box 
+                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}
+                onClick={() => onEdit?.(faq)}
+              >
                 <EditIcon sx={{ fontSize: 16, color: '#6b7280' }} />
                 <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>Edit</Typography>
               </Box>
@@ -94,10 +125,10 @@ const FaqList = () => {
               color: '#dc2626',
               fontWeight: 500
             }}>
-              5
+              {faqs.length}
             </Box>
             <Typography sx={{ fontSize: '14px', color: '#6b7280' }}>
-              of 124 results
+              of {totalResults || faqs.length} results
             </Typography>
           </Box>
         </Box>

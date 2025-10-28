@@ -9,6 +9,7 @@ import categorySlice from './slices/categorySlice';
 import bannerSlice from './slices/bannerSlice';
 import packageSlice from './slices/packageSlice';
 import studioSlice from './slices/studioSlice';
+import shiftSlice from './slices/shiftSlice';
 
 export const store = configureStore({
   reducer: {
@@ -22,5 +23,6 @@ export const store = configureStore({
     banner: bannerSlice,
     package: packageSlice,
     studio: studioSlice,
+    shift: shiftSlice,
   },
 });

@@ -38,7 +38,7 @@ function AddUserModal({ open, onClose, onSave, user = null, isEdit = false }) {
     category: user?.category?._id || user?.category || "",
     studio: user?.studio || "",
     pkg: user?.pkg || "",
-    paidAmount: user?.paidAmount || "",
+    paid_amount: user?.paid_amount || "",
     remainingAmount: user?.remainingAmount || "",
   };
 
@@ -50,7 +50,7 @@ function AddUserModal({ open, onClose, onSave, user = null, isEdit = false }) {
     try {
       const payload = {
         ...values,
-        paidAmount: Number(values.paidAmount || 0),
+        paid_amount: Number(values.paid_amount || 0),
         remainingAmount: Number(values.remainingAmount || 0),
       };
 
@@ -204,22 +204,22 @@ function AddUserModal({ open, onClose, onSave, user = null, isEdit = false }) {
                 label="Location *"
                 value={values.location}
                 onChange={(e) => setFieldValue("location", e.target.value)}
-                options={[{ label: "Select Location", value: "" }, ...locations.map(l => ({ label: l.name, value: l._id }))]}
+                options={[{ label: "Select Location", value: "" }, ...locations.map(l => ({ label: l.name, value: l.location_id || l._id }))]}
               />
 
               <CustomSelect
                 label="Category *"
                 value={values.category}
                 onChange={(e) => setFieldValue("category", e.target.value)}
-                options={[{ label: "Select Category", value: "" }, ...categories.map(c => ({ label: c.name, value: c._id }))]}
+                options={[{ label: "Select Category", value: "" }, ...categories.map(c => ({ label: c.name, value: c.category_id || c._id }))]}
               />
 
               <TextField
                 label="Paid Amount"
-                name="paidAmount"
+                name="paid_amount"
                 type="number"
                 fullWidth
-                value={values.paidAmount}
+                value={values.paid_amount}
                 onChange={handleChange}
               />
 

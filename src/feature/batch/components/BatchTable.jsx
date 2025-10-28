@@ -42,11 +42,11 @@ function BatchTable({
   data = [], 
   loading = false, 
   page = 1, 
-  pageSize = 10, 
+  rowsPerPage = 10, 
   totalPages = 1, 
   totalResults = 0,
   onPageChange,
-  onPageSizeChange,
+  onRowsPerPageChange,
   onEdit
 }) {
   const navigate = useNavigate();
@@ -83,11 +83,11 @@ function BatchTable({
         data={data}
         loading={loading}
         page={page}
-        pageSize={pageSize}
+        rowsPerPage={rowsPerPage}
         totalPages={totalPages}
         totalResults={totalResults}
         onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
+        onRowsPerPageChange={onRowsPerPageChange}
       />
       <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleClose}>
         <MenuItem onClick={handleDetail}>Detail</MenuItem>

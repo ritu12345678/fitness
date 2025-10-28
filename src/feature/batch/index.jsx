@@ -15,7 +15,7 @@ const Batch = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalResults, setTotalResults] = useState(0);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState(null);
@@ -24,7 +24,8 @@ const Batch = () => {
   const defaultFilters = {
     query: '',
     filter: 'all',
-    date: 'any'
+    start_date: '',
+    end_date: ''
   };
 
   // Use URL filters hook
@@ -39,12 +40,14 @@ const Batch = () => {
 
         const response = await apiService.get('admin/batches', params);
 
-        const batchesData = response?.data?.batches || response?.batches || response?.data || response || [];
+        // Handle paginated response structure
+        const batchesData = response?.data || response || [];
         const safeBatchesData = Array.isArray(batchesData) ? batchesData : [];
         setBatches(safeBatchesData);
 
+        // Extract pagination metadata from API response
         if (response?.pagination) {
-          setTotalResults(response.pagination.totalResults || safeBatchesData.length);
+          setTotalResults(response.pagination.total_items || safeBatchesData.length);
         } else {
           setTotalResults(safeBatchesData.length);
         }
@@ -63,7 +66,7 @@ const Batch = () => {
   const handleFilterChange = useCallback(() => {
     const params = {
       page: 1,
-      pageSize: pageSize
+      limit: rowsPerPage
     };
 
     if (filters.query) {
@@ -71,16 +74,21 @@ const Batch = () => {
     }
 
     if (filters.filter && filters.filter !== 'all') {
-      params.status = filters.filter;
+      params.status = filters.filter === 'active' ? true : false;
     }
 
-    if (filters.date && filters.date !== 'any') {
-      params.date = filters.date;
+    // Handle date range - only add if both dates exist
+    if (filters.start_date && filters.start_date !== '') {
+      params.start_date = filters.start_date;
+    }
+    
+    if (filters.end_date && filters.end_date !== '') {
+      params.end_date = filters.end_date;
     }
 
     setPage(1);
     debouncedFetchBatchesRef.current(params);
-  }, [filters, pageSize]);
+  }, [filters, rowsPerPage]);
 
   // Watch for filter changes and trigger API call
   useEffect(() => {
@@ -95,14 +103,16 @@ const Batch = () => {
 
         const response = await apiService.get('admin/batches', {
           page: 1,
-          pageSize: pageSize
+          limit: rowsPerPage
         });
 
-        const batchesData = response?.data?.batches || response?.batches || response?.data || response || [];
+        // Handle paginated response structure
+        const batchesData = response?.data || response || [];
         setBatches(Array.isArray(batchesData) ? batchesData : []);
 
+        // Extract pagination metadata from API response
         if (response?.pagination) {
-          setTotalResults(response?.pagination?.totalResults || batchesData.length);
+          setTotalResults(response?.pagination?.total_items || batchesData.length);
         } else {
           setTotalResults(batchesData.length);
         }
@@ -122,30 +132,101 @@ const Batch = () => {
   // Handle pagination changes - separate useEffect
   useEffect(() => {
     if (page > 1) {
-      debouncedFetchBatchesRef.current({ page, pageSize });
+      const params = {
+        page,
+        limit: rowsPerPage
+      };
+      
+      // Add filter parameters if they exist
+      if (filters.query) {
+        params.search = filters.query;
+      }
+      
+      if (filters.filter && filters.filter !== 'all') {
+        params.status = filters.filter === 'active' ? true : false;
+      }
+      
+      // Handle date range - only add if both dates exist
+      if (filters.start_date && filters.start_date !== '') {
+        params.start_date = filters.start_date;
+      }
+      
+      if (filters.end_date && filters.end_date !== '') {
+        params.end_date = filters.end_date;
+      }
+      
+      debouncedFetchBatchesRef.current(params);
     }
-  }, [page, pageSize]);
+  }, [page, rowsPerPage, filters]);
 
   const handlePageChange = (newPage) => {
     console.log('📄 Page changed to:', newPage);
     setPage(newPage);
   };
 
-  const handlePageSizeChange = (newPageSize) => {
+  const handleRowsPerPageChange = (newPageSize) => {
     console.log('📊 Page size changed to:', newPageSize);
-    setPageSize(newPageSize);
+    setRowsPerPage(newPageSize);
     setPage(1);
+    
+    const params = {
+      page: 1,
+      limit: newPageSize
+    };
+    
+    // Add filter parameters if they exist
+    if (filters.query) {
+      params.search = filters.query;
+    }
+    
+    if (filters.filter && filters.filter !== 'all') {
+      params.status = filters.filter === 'active' ? true : false;
+    }
+    
+    // Handle date range - only add if both dates exist
+    if (filters.start_date && filters.start_date !== '') {
+      params.start_date = filters.start_date;
+    }
+    
+    if (filters.end_date && filters.end_date !== '') {
+      params.end_date = filters.end_date;
+    }
+    
+    debouncedFetchBatchesRef.current(params);
   };
 
   const handleBatchCreated = useCallback(async (batchData) => {
     try {
+      const params = {
+        page: 1,
+        limit: rowsPerPage
+      };
+      
+      // Add filter parameters if they exist
+      if (filters.query) {
+        params.search = filters.query;
+      }
+      
+      if (filters.filter && filters.filter !== 'all') {
+        params.status = filters.filter === 'active' ? true : false;
+      }
+      
+      // Handle date range - only add if both dates exist
+      if (filters.start_date && filters.start_date !== '') {
+        params.start_date = filters.start_date;
+      }
+      
+      if (filters.end_date && filters.end_date !== '') {
+        params.end_date = filters.end_date;
+      }
+      
       // Refresh the batch list after successful creation
-      debouncedFetchBatchesRef.current({ page: 1, pageSize });
+      debouncedFetchBatchesRef.current(params);
     } catch (error) {
       showError('Failed to refresh batch list. Please try again.');
       console.error('Batch refresh error:', error);
     }
-  }, [pageSize, showError]);
+  }, [rowsPerPage, showError, filters]);
 
   const handleEditBatch = useCallback((batch) => {
     setSelectedBatch(batch);
@@ -159,17 +240,40 @@ const Batch = () => {
 
   const handleBatchUpdated = useCallback(async (batchData) => {
     try {
+      const params = {
+        page,
+        limit: rowsPerPage
+      };
+      
+      // Add filter parameters if they exist
+      if (filters.query) {
+        params.search = filters.query;
+      }
+      
+      if (filters.filter && filters.filter !== 'all') {
+        params.status = filters.filter === 'active' ? true : false;
+      }
+      
+      // Handle date range - only add if both dates exist
+      if (filters.start_date && filters.start_date !== '') {
+        params.start_date = filters.start_date;
+      }
+      
+      if (filters.end_date && filters.end_date !== '') {
+        params.end_date = filters.end_date;
+      }
+      
       // Refresh the batch list after successful update
-      debouncedFetchBatchesRef.current({ page, pageSize });
+      debouncedFetchBatchesRef.current(params);
       setEditModalOpen(false);
       setSelectedBatch(null);
     } catch (error) {
       showError('Failed to refresh batch list. Please try again.');
       console.error('Batch refresh error:', error);
     }
-  }, [page, pageSize, showError]);
+  }, [page, rowsPerPage, showError, filters]);
 
-  const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
+  const totalPages = Math.max(1, Math.ceil(totalResults / rowsPerPage));
 
   if (error) {
     return (
@@ -178,7 +282,7 @@ const Batch = () => {
           Error: {error}
         </div>
         <button
-          onClick={() => debouncedFetchBatchesRef.current({ page: 1, pageSize })}
+          onClick={() => debouncedFetchBatchesRef.current({ page: 1, limit: rowsPerPage })}
           className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Retry
@@ -194,11 +298,11 @@ const Batch = () => {
         data={batches}
         loading={loading}
         page={page}
-        pageSize={pageSize}
+        rowsPerPage={rowsPerPage}
         totalPages={totalPages}
         totalResults={totalResults}
         onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
         onEdit={handleEditBatch}
       />
       <AddBatchModal

@@ -4,7 +4,7 @@ import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {formatDate} from "../../../../constantFunctions"
 
-const TicketTable = ({ tickets = [], loading = false, error = null, totalResults = 0 }) => {
+const TicketTable = ({ tickets = [], loading = false, error = null, totalResults = 0, pagination, onPageChange, onRowsPerPageChange, page, rowsPerPage }) => {
   console.log('🎫 TicketTable - tickets:', tickets);
 
   // Map API response to table data - handle various field names
@@ -107,7 +107,13 @@ const TicketTable = ({ tickets = [], loading = false, error = null, totalResults
           keyField="id"
           initialRowsPerPage={10}
           rowsPerPageOptions={[5, 10, 25]}
-          enablePagination
+          enablePagination={true}
+          // Server-side pagination props
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={onPageChange}
+          onRowsPerPageChange={onRowsPerPageChange}
+          count={pagination?.total_items ?? totalResults}
           containerSx={{
             '& .MuiTableHead-root': {
               backgroundColor: '#f8f9fa',

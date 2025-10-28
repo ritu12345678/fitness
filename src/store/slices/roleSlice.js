@@ -19,8 +19,15 @@ export const fetchUsersByRole = createAsyncThunk(
   'role/fetchUsersByRole',
   async ({ roleId, params = {} }, { rejectWithValue }) => {
     try {
+      console.log('🔍 fetchUsersByRole called with params:', params);
       const res = await apiService.get(`users/role/${roleId}`, params);
-      return { roleId, users: res?.data?.users || res };
+      
+      // Handle paginated response structure
+      return { 
+        roleId, 
+        users: res?.data || res,
+        pagination: res?.pagination || null
+      };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -36,6 +43,14 @@ const roleSlice = createSlice({
     loading: false,
     error: null,
     rolesLoaded: false, // Flag to track if roles are loaded
+    pagination: {
+      current_page: 1,
+      total_pages: 1,
+      total_items: 0,
+      items_per_page: 10,
+      has_next: false,
+      has_prev: false,
+    },
   },
   reducers: {
     clearError: (state) => {
@@ -78,12 +93,18 @@ const roleSlice = createSlice({
       })
       .addCase(fetchUsersByRole.fulfilled, (state, action) => {
         state.loading = false;
-        const { roleId, users } = action.payload;
+        const { roleId, users, pagination } = action.payload;
         
         if (roleId === 2) {
-          state.users = users;
+          state.users = Array.isArray(users) ? users : users?.data || [];
+          if (pagination) {
+            state.pagination = pagination;
+          }
         } else if (roleId === 3) {
-          state.trainers = users;
+          state.trainers = Array.isArray(users) ? users : users?.data || [];
+          if (pagination) {
+            state.pagination = pagination;
+          }
         }
       })
       .addCase(fetchUsersByRole.rejected, (state, action) => {

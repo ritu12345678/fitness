@@ -29,7 +29,8 @@ export const useUrlFilters = (defaultFilters = {}) => {
     
     Object.keys(newFilters).forEach(key => {
       const value = newFilters[key];
-      if (value && value !== defaultFilters[key]) {
+      // Skip empty strings and only add values that differ from defaults
+      if (value && value !== '' && value !== defaultFilters[key]) {
         newSearchParams.set(key, value);
       }
     });
@@ -41,6 +42,13 @@ export const useUrlFilters = (defaultFilters = {}) => {
   // Update a single filter
   const updateFilter = (key, value) => {
     const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
+    updateUrl(newFilters);
+  };
+
+  // Update multiple filters at once (to prevent race conditions)
+  const updateMultipleFilters = (updates) => {
+    const newFilters = { ...filters, ...updates };
     setFilters(newFilters);
     updateUrl(newFilters);
   };
@@ -64,6 +72,7 @@ export const useUrlFilters = (defaultFilters = {}) => {
   return {
     filters,
     updateFilter,
+    updateMultipleFilters,
     clearAllFilters,
     hasActiveFilters
   };

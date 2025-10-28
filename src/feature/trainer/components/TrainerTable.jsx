@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 function useColumns(onOpenMenu) {
   return [
-    { key: 'id', header: '#' },
+    { key: 'id', header: '#', render: (value, row, rowIndex) => rowIndex + 1 },
     {
       key: 'profile',
       header: 'Profile',
@@ -21,8 +21,8 @@ function useColumns(onOpenMenu) {
     },
     { key: 'name', header: 'Name' },
     { key: 'mobile', header: 'Mobile Number' },
-    { key: 'role', header: 'Role' },
-    { key: 'location', header: 'Location' },
+    { key: 'role', header: 'Role',render:(_v,row)=>row?.role_id_data?.role_name },
+    { key: 'location', header: 'Location' ,render:(_v,row)=>row?.location_id_data?.name||"--" },
     {
       key: 'action',
       header: 'Action',
@@ -35,7 +35,7 @@ function useColumns(onOpenMenu) {
   ];
 }
 
-function TrainerTable({ trainers = [], loading = false, error = null, onEdit }) {
+function TrainerTable({ trainers = [], loading = false, error = null, onEdit, pagination, onPageChange, onRowsPerPageChange, page, rowsPerPage }) {
   const navigate = useNavigate();
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [selectedRow, setSelectedRow] = React.useState(null);
@@ -89,7 +89,18 @@ function TrainerTable({ trainers = [], loading = false, error = null, onEdit }) 
 
   return (
     <>
-      <CustomTable columns={columns} rows={trainers} />
+      <CustomTable 
+        columns={columns} 
+        rows={trainers}
+        keyField="id"
+        enablePagination={true}
+        // Server-side pagination props
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={onPageChange}
+        onRowsPerPageChange={onRowsPerPageChange}
+        count={pagination?.total_items ?? trainers.length}
+      />
       <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleClose}>
         <MenuItem onClick={handleDetail}>Detail</MenuItem>
         <MenuItem onClick={handleEdit}>Edit</MenuItem>

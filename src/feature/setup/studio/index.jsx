@@ -26,10 +26,15 @@ const Studio = () => {
   const { showError } = useToast();
   
   // URL filters
-  const { filters, updateFilter, clearAllFilters } = useUrlFilters({
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(9);
+  const [totalResults, setTotalResults] = useState(0);
+  
+  const { filters, updateFilter, updateMultipleFilters, clearAllFilters } = useUrlFilters({
     query: '',
     status: 'all',
-    date: 'any'
+    start_date: '',
+    end_date: ''
   });
 
   // Debounced fetch function
@@ -37,7 +42,14 @@ const Studio = () => {
     debounce(async (params = {}) => {
       dispatch(showLoader({ text: 'Loading studios...', type: 'page' }));
       try {
-        await dispatch(fetchStudios(params)).unwrap();
+        const response = await dispatch(fetchStudios(params)).unwrap();
+        
+        // Extract pagination metadata from API response
+        if (response?.pagination) {
+          setTotalResults(response.pagination.total_items || studios.length);
+        } else {
+          setTotalResults(studios.length);
+        }
       } catch (error) {
         showError('Failed to load studios. Please try again.');
         console.error('Studio fetch error:', error);
@@ -50,41 +62,90 @@ const Studio = () => {
   // Handle filter changes
   const handleFilterChange = useCallback((currentFilters) => {
     // Convert filters to API parameters
-    const params = {};
+    const params = {
+      page: 1,
+      limit: rowsPerPage,
+    };
     
     if (currentFilters.query) {
       params.search = currentFilters.query;
     }
     
     if (currentFilters.status && currentFilters.status !== 'all') {
-      params.status = currentFilters.status;
+      params.status = currentFilters.status === 'active' ? true : false;
     }
     
-    if (currentFilters.date && currentFilters.date !== 'any') {
-      params.date = currentFilters.date;
+    // Handle date range - only add if both dates exist
+    if (currentFilters.start_date && currentFilters.start_date !== '') {
+      params.start_date = currentFilters.start_date;
+    }
+    
+    if (currentFilters.end_date && currentFilters.end_date !== '') {
+      params.end_date = currentFilters.end_date;
     }
 
     // Use debounced API call
     debouncedFetch(params);
-  }, [debouncedFetch]);
+    setPage(1); // Reset to first page
+  }, [debouncedFetch, rowsPerPage]);
 
   const handleAddStudio = () => {
     setSelectedStudio(null);
     setModalOpen(true);
   };
 
+  // Handle pagination
+  const handlePageChange = useCallback((newPage) => {
+    setPage(newPage);
+  }, []);
+
+  const handleRowsPerPageChange = useCallback((event) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    setRowsPerPage(newRowsPerPage);
+    setPage(1);
+  }, []);
+
   // Refresh immediately (used after add/edit)
   const refreshStudios = useCallback(async () => {
+    const params = {
+      page,
+      limit: rowsPerPage,
+    };
+    
+    if (filters.query) {
+      params.search = filters.query;
+    }
+    
+    if (filters.status && filters.status !== 'all') {
+      params.status = filters.status === 'active' ? true : false;
+    }
+    
+    // Handle date range - only add if both dates exist
+    if (filters.start_date && filters.start_date !== '') {
+      params.start_date = filters.start_date;
+    }
+    
+    if (filters.end_date && filters.end_date !== '') {
+      params.end_date = filters.end_date;
+    }
+    
     dispatch(showLoader({ text: 'Refreshing studios...', type: 'inline' }));
     try {
-      await dispatch(fetchStudios()).unwrap();
+      const response = await dispatch(fetchStudios(params)).unwrap();
+      
+      // Extract pagination metadata from API response
+      if (response?.pagination) {
+        setTotalResults(response.pagination.total_items || studios.length);
+      } else {
+        setTotalResults(studios.length);
+      }
     } catch (error) {
       showError('Failed to refresh studios. Please try again.');
       console.error('Studio refresh error:', error);
     } finally {
       dispatch(hideLoader());
     }
-  }, [dispatch]);
+  }, [dispatch, showError, page, rowsPerPage, filters]);
 
   // Open modal for edit
   const handleEditStudio = (studio) => {
@@ -115,6 +176,7 @@ const Studio = () => {
         refreshStudios={refreshStudios}
         filters={filters}
         updateFilter={updateFilter}
+        updateMultipleFilters={updateMultipleFilters}
         clearFilters={clearAllFilters}
         onFilterChange={handleFilterChange}
       />

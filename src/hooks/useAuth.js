@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { logout, getCurrentUser } from '../store/slices/authSlice';
+import { logout } from '../store/slices/authSlice';
 
 export const useAuth = () => {
   const dispatch = useDispatch();
@@ -13,14 +13,6 @@ export const useAuth = () => {
     }
   };
 
-  const refreshUser = async () => {
-    try {
-      await dispatch(getCurrentUser()).unwrap();
-    } catch (error) {
-      console.error('Failed to refresh user:', error);
-    }
-  };
-
   return {
     user,
     token,
@@ -28,9 +20,10 @@ export const useAuth = () => {
     loading,
     error,
     logout: handleLogout,
-    refreshUser,
   };
 };
+
+
 
 
 

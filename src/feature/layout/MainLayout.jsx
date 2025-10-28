@@ -44,7 +44,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import GlobalLoader from '../../components/GlobalLoader';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../store/slices/authSlice';
+import { logout, getUserProfile } from '../../store/slices/authSlice';
 import { fetchRoles } from '../../store/slices/roleSlice';
 import { useToast } from '../../hooks/useToast';
 
@@ -58,16 +58,19 @@ function Layout(props) {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.auth);
+  const { loading, user } = useSelector((state) => state.auth);
   const { rolesLoaded } = useSelector((state) => state.role);
   const { showSuccess, showError } = useToast();
 
-  // Fetch roles on app startup
+  // Fetch roles and user profile on app startup
   React.useEffect(() => {
     if (!rolesLoaded) {
       dispatch(fetchRoles());
     }
-  }, [dispatch, rolesLoaded]);
+    if (!user) {
+      dispatch(getUserProfile());
+    }
+  }, [dispatch, rolesLoaded, user]);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -83,7 +86,7 @@ function Layout(props) {
       setMobileOpen(!mobileOpen);
     }
   };
-
+console.log("userrr",user)
   const menuItems = [
     { text: 'Overview', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'User', icon: <PersonOutlineIcon />, path: '/user' },
@@ -312,10 +315,16 @@ function Layout(props) {
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Avatar sx={{ width: 30, height: 30, bgcolor: '#e5e7eb' }} />
+            <Avatar sx={{ width: 30, height: 30, bgcolor: '#e5e7eb' }}>
+              {user ? ( user.name || 'U')[0].toUpperCase() : 'U'}
+            </Avatar>
             <Box>
-              <Typography variant="body2" sx={{ lineHeight: 1 }}>Filippo Inzaghi</Typography>
-              <Typography variant="caption" color="text.secondary">user@mail.com</Typography>
+              <Typography variant="body2" sx={{ lineHeight: 1 }}>
+                {user ? (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.name || user.email?.split('@')[0] || 'User') : 'Loading...'}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {user?.email || 'No email'}
+              </Typography>
             </Box>
           </Box>
         </Toolbar>
