@@ -75,7 +75,7 @@ function DetailTable({ batch }) {
   // Use batch trainers data or show empty state
   const trainersData = Array.isArray(batch?.trainers) ? batch.trainers : [];
   
-  console.log('DetailTable using students data:', studentsData)
+  console.log('DetailTable using trainers data:', trainersData)
 
   return (
     <>

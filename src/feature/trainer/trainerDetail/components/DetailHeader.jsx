@@ -6,7 +6,7 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import MovieEditIcon from '@mui/icons-material/MovieEdit';
 
-function DetailHeader({ trainer, onEdit }) {
+function DetailHeader({ trainer, onEdit, bankDetails }) {
   // Default trainer data if none provided
   const defaultTrainer = {
     name: "Abhishek Sharma",
@@ -20,6 +20,7 @@ function DetailHeader({ trainer, onEdit }) {
   };
 
   const trainerData = trainer?.user || defaultTrainer;
+  const bankData = bankDetails?.[0];
 
   return (
     <div className="relative bg-white border border-gray-200 rounded-xl p-4 flex justify-between items-start shadow-sm">
@@ -66,17 +67,21 @@ function DetailHeader({ trainer, onEdit }) {
       {/* Bank Details */}
       <div className="flex flex-col flex-1">
         <p className="font-semibold mb-2 text-black text-base">Bank Details</p>
-        <div className="flex flex-col gap-1 text-sm text-gray-600">
-          <span className="inline-flex items-center gap-2">
-            <AccountBalanceIcon sx={{ fontSize: 16 }} /> IFSC: SBIN000456
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <PhoneIphoneOutlinedIcon sx={{ fontSize: 16 }} /> 9875678818
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <EmailOutlinedIcon sx={{ fontSize: 16 }} /> abhishek@gmail.com
-          </span>
-        </div>
+        {!bankData ? (
+          <div className="text-sm text-gray-500">No bank details found</div>
+        ) : (
+          <div className="flex flex-col gap-1 text-sm text-gray-600">
+            <span className="inline-flex items-center gap-2">
+              <AccountBalanceIcon sx={{ fontSize: 16 }} /> IFSC: {bankData?.ifsc_code || 'N/A'}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <PhoneIphoneOutlinedIcon sx={{ fontSize: 16 }} /> Account: {bankData?.account_no || 'N/A'}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <EmailOutlinedIcon sx={{ fontSize: 16 }} /> {bankData?.bank_name || 'N/A'} - {bankData?.holdername || 'N/A'}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
