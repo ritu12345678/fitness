@@ -19,7 +19,7 @@ function DetailHeader({ trainer, onEdit }) {
     gender: "Male"
   };
 
-  const trainerData = trainer || defaultTrainer;
+  const trainerData = trainer?.user || defaultTrainer;
 
   return (
     <div className="relative bg-white border border-gray-200 rounded-xl p-4 flex justify-between items-start shadow-sm">
@@ -35,14 +35,14 @@ function DetailHeader({ trainer, onEdit }) {
       <div className="flex flex-col items-start gap-2 flex-1">
         <div className="flex items-center gap-3">
           <UserAvatar
-            name="Abhishek Sharma"
+            name={trainerData?.name}
             src="https://i.pravatar.cc/80?img=31"
             size={56}
           />
           <div>
-            <p className="font-semibold text-lg text-black">Abhishek Sharma</p>
+            <p className="font-semibold text-lg text-black capitalize">{trainerData?.name}</p>
             <p className="text-xs text-gray-600">27 Nov 1998</p>
-            <p className="text-xs text-gray-600">Male</p>
+            <p className="text-xs text-gray-600 capitalize">{trainerData?.gender}</p>
           </div>
         </div>
       </div>
@@ -52,13 +52,13 @@ function DetailHeader({ trainer, onEdit }) {
         <p className="font-semibold mb-2 text-black text-base">Contact Details</p>
         <div className="flex flex-col gap-1 text-sm text-gray-600">
           <span className="inline-flex items-center gap-2">
-            <EmailOutlinedIcon sx={{ fontSize: 16 }} /> abhishek@gmail.com
+            <EmailOutlinedIcon sx={{ fontSize: 16 }} /> {trainerData?.email}
           </span>
           <span className="inline-flex items-center gap-2">
-            <PhoneIphoneOutlinedIcon sx={{ fontSize: 16 }} /> 9875678818
+            <PhoneIphoneOutlinedIcon sx={{ fontSize: 16 }} /> {trainerData?.mobile}
           </span>
           <span className="inline-flex items-center gap-2">
-            <LocationOnOutlinedIcon sx={{ fontSize: 16 }} /> 123, Main Road, 625501
+            <LocationOnOutlinedIcon sx={{ fontSize: 16 }} /> {trainerData?.address}
           </span>
         </div>
       </div>

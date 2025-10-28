@@ -94,7 +94,7 @@ function TeamFilters({ onFilterChange, refreshRoles, onAddRole }) {
      
         <button 
           onClick={onAddRole} 
-          className="bg-white border border-gray-200 text-black px-3 py-2 text-sm rounded-2xl hover:bg-gray-50"
+          className="bg-[#F6A5A5] text-black px-3 py-2 text-sm rounded-2xl"
         >
           + Add Role
         </button>

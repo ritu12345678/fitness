@@ -49,7 +49,11 @@ function TrainerTable({ trainers = [], loading = false, error = null, onEdit, pa
   };
   const handleDetail = () => {
     handleClose();
+    if (selectedRow?.user_id) {
+      navigate(`/trainer/detail/${selectedRow.user_id}`);
+    } else {
     navigate('/trainer/detail');
+    }
   };
   const handleEdit = () => {
     handleClose();

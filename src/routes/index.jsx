@@ -58,7 +58,7 @@ export const router = createBrowserRouter([
   },
   { path: '/user', element: <ProtectedRoute><Layout /></ProtectedRoute>, children: [{ index: true, element: <UserPage /> }] },
   { path: '/user/:userId', element: <ProtectedRoute><Layout /></ProtectedRoute>, children: [{ index: true, element: <UserDetailPage /> }] },
-  { path: '/trainer/detail', element: <ProtectedRoute><Layout /></ProtectedRoute>, children: [{ index: true, element: <TrainerDetailPage /> }] },
+  { path: '/trainer/detail/:userId', element: <ProtectedRoute><Layout /></ProtectedRoute>, children: [{ index: true, element: <TrainerDetailPage /> }] },
   { path: '/trainer', element: <ProtectedRoute><Layout /></ProtectedRoute>, children: [{ index: true, element: <TrainerPage /> }] },
   { path: '/batch', element: <ProtectedRoute><Layout /></ProtectedRoute>, children: [{ index: true, element: <BatchPage /> }] },
   { path: '/batch/detail/:batchId', element: <ProtectedRoute><Layout /></ProtectedRoute>, children: [{ index: true, element: <BatchDetailPage /> }] },

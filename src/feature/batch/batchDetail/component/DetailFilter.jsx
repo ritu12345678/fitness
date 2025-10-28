@@ -2,18 +2,20 @@ import React from 'react';
 import CustomSelect from '../../../../components/CustomSelect';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import MenuItem from '@mui/material/MenuItem';
+import DateRangePicker from '../../../../components/DateRangePicker';
 import { useUrlFilters } from '../../../../hooks/useUrlFilters';
 
 function DetailFilters({ batch }) {
   // Define default filters for URL
   const defaultFilters = {
-    query: '',
-    filter: 'all',
-    date: 'any'
+  	query: '',
+  	filter: 'all',
+  	start_date: '',
+  	end_date: ''
   };
 
   // Use URL filters hook
-  const { filters, updateFilter, clearAllFilters, hasActiveFilters } = useUrlFilters(defaultFilters);
+  const { filters, updateFilter, updateMultipleFilters, clearAllFilters, hasActiveFilters } = useUrlFilters(defaultFilters);
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex items-center gap-3">
@@ -53,17 +55,15 @@ function DetailFilters({ batch }) {
         </CustomSelect>
       </div>
       
-      {/* Date Filter */}
-      <div className="w-28">
-        <CustomSelect
-          size="small"
-          value={filters.date}
-          onChange={(e) => updateFilter('date', e.target.value)}
-          options={[
-            { label: 'Date', value: 'any' }, 
-            { label: 'Today', value: 'today' }, 
-            { label: 'This week', value: 'week' }
-          ]}
+      {/* Date Range Filter */}
+      <div>
+        <DateRangePicker
+          startDate={filters.start_date}
+          endDate={filters.end_date}
+          onChange={(startDate, endDate) => {
+            updateMultipleFilters({ start_date: startDate, end_date: endDate });
+          }}
+          onClear={() => { updateFilter('start_date', ''); updateFilter('end_date', ''); }}
         />
       </div>
       

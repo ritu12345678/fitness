@@ -46,7 +46,7 @@ const TeamMemberTable = ({ teamMembers = [], loading = false, error = null, onEd
       className: 'text-left',
       render: (value, row) => (
         <span className="px-2 py-1 rounded-xl text-xs bg-blue-100 text-blue-800">
-          {row.role_name || 'N/A'}
+          {row.role_id_data?.role_name || 'N/A'}
         </span>
       ),
     },

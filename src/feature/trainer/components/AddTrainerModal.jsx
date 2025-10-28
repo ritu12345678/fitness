@@ -88,6 +88,9 @@ function AddTrainerModal({ open, onClose, onSave, trainer = null, isEdit = false
     name: trainer?.name || "",
     email: trainer?.email || "",
     mobile: trainer?.mobile || "",
+    dob: trainer?.dob || "",
+    gender: trainer?.gender || "",
+    address: trainer?.address || "",
     location_id: getLocationId(),
     shift_id: trainer?.shift_id  || "",
     password: "",
@@ -105,6 +108,9 @@ function AddTrainerModal({ open, onClose, onSave, trainer = null, isEdit = false
         name: values.name,
         email: values.email,
         mobile: values.mobile,
+        DOB: values.dob,
+        gender: values.gender,
+        address: values.address,
         location_id: values.location_id,
         shift_id: values.shift_id,
       };
@@ -176,84 +182,147 @@ function AddTrainerModal({ open, onClose, onSave, trainer = null, isEdit = false
               </div>
 
               {/* Name */}
-              <TextField
-                label="Name *"
-                name="name"
-                fullWidth
-                value={values.name}
-                onChange={handleChange}
-                error={touched.name && Boolean(errors.name)}
-                helperText={touched.name && errors.name}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <input
+                  name="name"
+                  value={values.name}
+                  onChange={handleChange}
+                  className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                />
+                {touched.name && errors.name && (
+                  <p className="text-xs text-red-600 mt-1">{errors.name}</p>
+                )}
+              </div>
 
               {/* Email */}
-              <TextField
-                label="Email *"
-                name="email"
-                type="email"
-                fullWidth
-                value={values.email}
-                onChange={handleChange}
-                error={touched.email && Boolean(errors.email)}
-                helperText={touched.email && errors.email}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                />
+                {touched.email && errors.email && (
+                  <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+                )}
+              </div>
 
               {/* Mobile */}
-              <TextField
-                label="Mobile Number *"
-                name="mobile"
-                fullWidth
-                value={values.mobile}
-                onChange={handleChange}
-                error={touched.mobile && Boolean(errors.mobile)}
-                helperText={touched.mobile && errors.mobile}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number *</label>
+                <input
+                  name="mobile"
+                  value={values.mobile}
+                  onChange={handleChange}
+                  className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                />
+                {touched.mobile && errors.mobile && (
+                  <p className="text-xs text-red-600 mt-1">{errors.mobile}</p>
+                )}
+              </div>
+
+              {/* Date of Birth */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                <input
+                  type="date"
+                  name="dob"
+                  value={values.dob}
+                  onChange={handleChange}
+                  className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                />
+              </div>
+
+              {/* Gender */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                <select
+                  name="gender"
+                  value={values.gender}
+                  onChange={handleChange}
+                  className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              {/* Address */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <textarea
+                  name="address"
+                  value={values.address}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                />
+              </div>
 
               {/* Location */}
-              <CustomSelect
-                label="Location *"
-                value={values.location_id}
-                onChange={(e) => setFieldValue("location_id", e.target.value)}
-                options={[{ label: "Select Location", value: "" }, ...locations.map(l => ({ label: l.name, value: l.location_id || l._id }))]}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+                <select
+                  value={values.location_id}
+                  onChange={(e) => setFieldValue("location_id", e.target.value)}
+                  className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                >
+                  <option value="">Select Location</option>
+                  {locations.map(l => (
+                    <option key={l.location_id || l._id} value={l.location_id || l._id}>{l.name}</option>
+                  ))}
+                </select>
+              </div>
 
               {/* Shift */}
-              <CustomSelect
-                label="Shift *"
-                value={values.shift_id}
-                onChange={(e) => setFieldValue("shift_id", e.target.value)}
-                options={[
-                  { label: "Select Shift", value: "" },
-                  ...shifts.map(s => ({ 
-                    label: s.shift_title || s.shift_name || "", 
-                    value: s.shift_id || ""
-                  }))
-                ]}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Shift *</label>
+                <select
+                  value={values.shift_id}
+                  onChange={(e) => setFieldValue("shift_id", e.target.value)}
+                  className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                >
+                  <option value="">Select Shift</option>
+                  {shifts.map(s => (
+                    <option key={s.shift_id || s._id} value={s.shift_id || s._id}>{s.shift_title || s.shift_name || ""}</option>
+                  ))}
+                </select>
+              </div>
 
               {/* Password fields only for new trainer */}
               {!isEdit && (
                 <>
-                  <TextField
-                    label="Password *"
-                    type="password"
-                    name="password"
-                    fullWidth
-                    value={values.password}
-                    onChange={handleChange}
-                    error={touched.password && Boolean(errors.password)}
-                    helperText={touched.password && errors.password}
-                  />
-                  <TextField
-                    label="Confirm Password *"
-                    type="password"
-                    name="confirmPassword"
-                    fullWidth
-                    value={values.confirmPassword}
-                    onChange={handleChange}
-                    error={touched.confirmPassword && Boolean(errors.confirmPassword)}
-                    helperText={touched.confirmPassword && errors.confirmPassword}
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={values.password}
+                      onChange={handleChange}
+                      className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                    />
+                    {touched.password && errors.password && (
+                      <p className="text-xs text-red-600 mt-1">{errors.password}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      value={values.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                    />
+                    {touched.confirmPassword && errors.confirmPassword && (
+                      <p className="text-xs text-red-600 mt-1">{errors.confirmPassword}</p>
+                    )}
+                  </div>
                 </>
               )}
             </div>

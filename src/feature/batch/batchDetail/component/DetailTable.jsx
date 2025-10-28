@@ -72,14 +72,20 @@ function DetailTable({ batch }) {
 
   const columns = useColumns(handleOpenMenu);
 
-  // Use batch students data or fallback to mock data
-  const studentsData = batch?.students || rows;
+  // Use batch trainers data or show empty state
+  const trainersData = Array.isArray(batch?.trainers) ? batch.trainers : [];
   
   console.log('DetailTable using students data:', studentsData)
 
   return (
     <>
-      <CustomTable columns={columns} data={studentsData} />
+      {trainersData.length === 0 ? (
+        <div className="flex justify-center items-center py-8">
+          <div className="text-gray-500">No trainers found for this batch</div>
+        </div>
+      ) : (
+        <CustomTable columns={columns} data={trainersData} />
+      )}
       <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleClose}>
         <MenuItem onClick={handleDetail}>Detail</MenuItem>
       </Menu>
